@@ -1,0 +1,89 @@
+> php -v
+> composer -v
+
+> crete laravel project
+    composer create-project --prefer-dist laravel/laravel laravel-api
+
+> *run project
+> php artisan serve //localhost:8000
+
+* (Build rest api in laravel + MySQL) + React.js
+
+> php artisan install:api //case new project no route/api.php
+    use Illuminate\Http\Request;
+    use Illuminate\Support\Facades\Route;
+
+    Route::get('/user', function (Request $request) {
+        return $request->user();
+    })->middleware('auth:sanctum');
+
+     post get put delete http method
+     - param ,body
+     
+    1.connection to MySQL in .ev file
+        - create new database "db-pos-phone-shop" in phpmyAdmin
+        - in .env
+        >php artisan migrate
+
+
+    - basic Route
+    Route::method_name('/route_name', $callback_function)
+    method_name get , post , put , delete
+    route_name
+        user
+        product
+        category
+        order
+        $callback_function
+        body of the function
+
+        * Role id name code description status create_at updated_at
+    - controller
+        >php artisan make:controller RoleController --api // use build api
+    - Model ORM Eloquent
+        > php artisan make:model Role -m
+	- add column name in app\model Role
+	>  php artisan migrate:status
+	>  php artisan migrate
+១. បង្កើត Migration ថ្មី
+	* php artisan make:migration add_column_to_roles_table --table=roles
+២. បន្ថែម Column ក្នុង File ដែលទើបបង្កើត
+public function up(): void
+{
+    Schema::table('roles', function (Blueprint $table) {
+        // បន្ថែម column ថ្មីនៅទីនេះ
+        $table->string('description')->nullable()->after('role_name'); 
+        // ប្រើ ->after('...') ដើម្បីកំណត់ទីតាំង column ឱ្យនៅបន្ទាប់ពី column ណាមួយ
+    });
+}
+
+public function down(): void
+{
+    Schema::table('roles', function (Blueprint $table) {
+        // កុំភ្លេចដាក់កូដសម្រាប់លុប column វិញពេលយើង rollback
+        $table->dropColumn('description');
+    });
+}
+៣. Run Migration
+	*php artisan migrate
+    - ORM (Object-Relational Mapping) Class <--> DB Eloquent
+    - CRUD (Create – Read – Update – Delete)
+
+* Category (id name description status parent_id)
+
+php artisan make:model Category -mcr
+-m: Creates a migration file for the categories table (located in database/migrations).
+-c: Creates a controller (in app/Http/Controllers) named CategoryController.
+-r: Indicates that the controller will be a resource controller, with all CRUD methods (index, store, show, update, destroy).
+- mirate file
+	Category (id name description status parent_id)
+	> php artisan migrate
+Route::apiResource('categories', CategoryController::class);
+
+
+
+
+
+
+
+

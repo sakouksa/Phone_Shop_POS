@@ -1,0 +1,33 @@
+Province (id, name, code, description, distand_from_city, status)
+
+>Model -> php artisan make:model Province -m
+	- model Province?
+	- create_province_table.php
+>php artisan migrate
+
+> controller -> php artisan make:controller ProvinceController --api
+>Reuest -> php artisan make:request ProvinceRequest
+
+- index
+- store
+- show
+- update
+- destroy
+-> controller api
+
+- api.php
+> Testing in postment
+ ReactJs intergrate API (Laravel + MySQL)
+ReactJs list Role
+	url api : localhost:8001/api/role
+	methode : get
+
+	in ReactJs
+	>npm install axios
+
+> npm install dayjs // for date
+
++ Create new role
++ Remove Role
+
+Province (ReactJs+API)

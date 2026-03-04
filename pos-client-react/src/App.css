@@ -1,0 +1,77 @@
+#root {
+  width: 100%;
+  min-height: 100vh;
+}
+
+.layout-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  /* បន្ថែមដើម្បីឱ្យវត្ថុនៅចំកណ្តាលជួរដេក */
+  padding: 0 15px;
+  background-color: #fff;
+  height: 80px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  /* បន្ថែមស្រមោលតិចៗឱ្យស្អាត */
+}
+
+.txt-brandname {
+  font-size: 22px;
+  font-weight: bold;
+  line-height: 1.2;
+}
+
+.txt-username {
+  font-size: 16px;
+  /* កែពី 20px មក 16px ដើម្បីឱ្យសមសួន */
+  font-weight: bold;
+  line-height: 1.2;
+}
+
+.layout-logo {
+  width: 45px;
+  height: 45px;
+  object-fit: contain;
+}
+
+.layout-profile {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  /* ធ្វើឱ្យរូបភាព Profile មូល */
+  object-fit: cover;
+}
+
+/* រក្សាទុក Animation និង Style ផ្សេងទៀតរបស់អ្នក */
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.main-page-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
