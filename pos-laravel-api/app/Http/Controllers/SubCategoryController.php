@@ -2,108 +2,128 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Sub_categories;
+use App\Models\Categories;
 use App\Http\Requests\SubCategoryRequest;
-use App\Models\Sub_categories; // ឬ SubCategory តាមឈ្មោះ Model បង
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class SubCategoryController extends Controller
 {
-    // ទាញយកបញ្ជី Sub-categories ព្រមទាំង Search និង Filter តាម Category មេ
-    public function index(Request $req)
+    // Get list of subcategories with filters and pagination
+    public function index(Request $request)
     {
-        $query = Sub_categories::with('category'); // ទាញទាំងព័ត៌មាន Category មេមកជាមួយ
+        $query = Sub_categories::query(); // ORM Eloquent
 
-        // ស្វែងរកតាមឈ្មោះ
-        if ($req->has("text_search")) {
-            $query->where("name", "LIKE", "%" . $req->input("text_search") . "%");
+        if ($request->has('id')) {
+            $query->where("id", "=", $request->input("id"));
+        }
+        if ($request->has('category_id')) {
+            $query->where("category_id", "=", $request->input("category_id"));
+        }
+        if ($request->has('txt_search')) {
+            $query->where("name", "LIKE", "%" . $request->input("txt_search") . "%");
+        }
+        if ($request->has('status')) {
+            $query->where("status", "=", $request->input("status"));
         }
 
-        // Filter តាម Category មេ (ឧទាហរណ៍៖ ចង់មើលតែ Sub-category របស់ iPhone)
-        if ($req->has("category_id")) {
-            $query->where("category_id", "=", $req->input("category_id"));
-        }
-
-        // Filter តាមស្ថានភាព
-        if ($req->has("status")) {
-            $query->where("status", "=", $req->input("status"));
-        }
-
-        $list = $query->orderBy('id', 'desc')->get();
+        $sub_categories = $query->with(['category'])->orderBy('id', 'desc')->get(); // Fetch list with related category data
 
         return response()->json([
-            'list' => $list,
+            "list"     => $sub_categories,
+            "category" => Categories::all(),
         ]);
     }
 
-    // បង្កើត Sub-category ថ្មី
+    // Store a new subcategory
     public function store(SubCategoryRequest $request)
     {
-        $subCategory = Sub_categories::create($request->validated());
+        $data = $request->validated();
+        $data['slug'] = Str::slug($request->name);
 
+        if ($request->hasFile('image')) {
+            // crate Folder sub_categories in storage/app/public
+            $data['image'] = $request->file('image')->store('sub_categories', 'public');
+        }
+
+        $sub = Sub_categories::create($data);
         return response()->json([
-            'data' => $subCategory,
-            'message' => 'បានបង្កើតប្រភេទកូនថ្មីដោយជោគជ័យ',
-        ]);
+            "message" => "រក្សាទុកអនុប្រភេទបានជោគជ័យ!",
+            "data"    => $sub,
+        ], 201);
     }
 
-    // បង្ហាញព័ត៌មានលម្អិត
+    // Show a single subcategory
     public function show(string $id)
     {
-        $subCategory = Sub_categories::with('category')->find($id);
-        if (!$subCategory) {
-            return response()->json(['message' => 'រកមិនឃើញទិន្នន័យ'], 404);
+        $sub = Sub_categories::with('category')->find($id);
+        if (!$sub) {
+            return response()->json([
+                "message" => "រកមិនឃើញទិន្នន័យ",
+            ], 404);
         }
-        return $subCategory;
+        return response()->json([
+            "data" => $sub,
+        ], 200);
     }
 
-    // កែប្រែទិន្នន័យ
+    // Update the specified resource in storage
     public function update(SubCategoryRequest $request, string $id)
     {
-        $subCategory = Sub_categories::findOrFail($id);
-        $subCategory->update($request->validated());
+        $sub = Sub_categories::find($id);
+        if (!$sub) {
+            return response()->json([
+                "message" => "រកមិនឃើញទិន្នន័យ",
+            ], 404);
+        }
 
+        $data = $request->validated();
+        $data['slug'] = Str::slug($request->name);
+
+        if ($request->hasFile('image')) {
+            if ($sub->image) {
+                Storage::disk('public')->delete($sub->image);
+            }
+            $data['image'] = $request->file('image')->store('sub_categories', 'public');
+        }
+
+        if ($request->image_remove != "") {
+            if ($sub->image) {
+                Storage::disk('public')->delete($sub->image);
+            }
+            $data['image'] = null;
+        }
+
+        $sub->update($data);
         return response()->json([
-            'data' => $subCategory,
-            'message' => 'បានកែប្រែទិន្នន័យដោយជោគជ័យ',
-        ]);
+            "data"    => $sub,
+            "message" => "ធ្វើបច្ចុប្បន្នភាពបានជោគជ័យ!",
+        ], 200);
     }
 
-    // លុបទិន្នន័យ
+    // Delete a subcategory
     public function destroy(string $id)
     {
-        $subCategory = Sub_categories::find($id);
-        if (!$subCategory) {
+        $sub = Sub_categories::find($id);
+
+        if (!$sub) {
             return response()->json([
-                'error' => true,
-                'message' => 'រកមិនឃើញទិន្នន័យឡើយ',
-            ]);
+                "message" => "រកមិនឃើញទិន្នន័យ",
+            ], 404);
         }
 
-        $subCategory->delete();
-        return response()->json([
-            'data' => $subCategory,
-            'message' => 'បានលុបទិន្នន័យដោយជោគជ័យ',
-        ]);
-    }
-
-    // ផ្លាស់ប្តូរស្ថានភាព
-    public function changeStatus(Request $request, $id)
-    {
-        $subCategory = Sub_categories::find($id);
-        if (!$subCategory) {
-            return response()->json([
-                'error' => true,
-                'message' => 'រកមិនឃើញទិន្នន័យឡើយ',
-            ]);
+        if ($sub->image) {
+            Storage::disk('public')->delete($sub->image);
         }
 
-        $subCategory->status = $request->input('status');
-        $subCategory->save();
+        $sub->delete();
 
         return response()->json([
-            'data' => $subCategory,
-            'message' => 'ស្ថានភាពត្រូវបានផ្លាស់ប្តូរដោយជោគជ័យ',
-        ]);
+            "message" => "លុបបានជោគជ័យ!",
+            "data"    => $sub
+        ], 200);
     }
 }

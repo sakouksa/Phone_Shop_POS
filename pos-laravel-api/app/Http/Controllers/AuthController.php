@@ -13,28 +13,37 @@ class AuthController extends Controller
     // Register a new user
     public function register(Request $request)
     {
-        // កែសម្រួល Validation ឱ្យត្រូវនឹងអ្វីដែលអ្នកផ្ញើពី Postman
         $request->validate([
-            'full_name' => 'required|string|max:255',
-            'username'  => 'required|string|unique:users',
-            'email'     => 'required|string|email|unique:users',
-            'password'  => 'required|string|min:6|confirmed',
+            'name' => 'required|string',
+            'email' => 'required|string|email|unique:users,email',
+            'password' => 'required|string|min:6|confirmed',
+            'phone' => 'nullable',
+            'address' => 'nullable',
+            'type' => 'nullable',
+            'image' => 'nullable|image|mimes:jpeg,png,gif|max:5120',
         ]);
-
-        // បង្កើត User ចូលទៅក្នុង Table ថ្មី
+        //create the user
         $user = User::create([
-            'full_name' => $request->full_name,
-            'username'  => $request->username,
-            'email'     => $request->email,
-            'password'  => Hash::make($request->password),
-            'role_id'   => $request->role_id ?? null,
-            'phone'     => $request->phone ?? null,
-            'status'    => $request->status ?? 'active',
+            'name' => $request->name, //body json client $request->name | $request->input('name')
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+        ]);
+        //Handle the image upload if exist
+        $imagePath = null;
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('profile', 'public');
+        }
+        //create the profile
+        $user->profile()->create([
+            'phone' => $request->phone,
+            'address' => $request->address,
+            'image' => $imagePath,
+            'type' => $request->type,
         ]);
 
         return response()->json([
-            'user' => $user,
-            'message' => 'ការចុះឈ្មោះអ្នកប្រើប្រាស់បានជោគជ័យ',
+            'user' => $user->load('profile'),
+            'message' => 'Register successfully ',
         ], 201);
     }
     // Login a user and return a JWT token
@@ -44,22 +53,22 @@ class AuthController extends Controller
             'email'    => 'required|string|email',
             'password' => 'required|string',
         ]);
-
-        // ចាប់យកតែ Email និង Password ពី Request
+        // attempt to verify the credentials and create a token for the user
         $credentials = $request->only('email', 'password');
 
-        // ៣. verify Database តាមរយៈ JWTAuth
+        // verify the credentials and create a token for the user
         if (!$token = JWTAuth::attempt($credentials)) {
             return response()->json([
                 'error' => 'អ៊ីមែល ឬលេខសម្ងាត់របស់អ្នកមិនត្រឹមត្រូវទេ!'
             ], 401);
         }
-
+        $user = auth()->user()->load('profile');
         //Access Token
         return response()->json([
             'access_token' => $token,
             'token_type'   => 'bearer',
-            'user'         => JWTAuth::user(),
+            'user'         => $user,
+            'message'      => 'ចូលប្រើបានជោគជ័យ!',
         ]);
     }
 }

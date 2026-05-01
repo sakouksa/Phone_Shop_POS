@@ -1,12 +1,13 @@
 <?php
 
+use App\Http\Controllers\ImeiTrackingController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\SubCategoryController;
-
-
+use App\Http\Controllers\BrandController;
+use App\Http\Controllers\SupplierController;
 //  Public Routes
 
 Route::post('register', [AuthController::class, 'register']);
@@ -20,10 +21,10 @@ Route::middleware('auth:api')->group(function () {
         return response()->json($request->user());
     });
 
-    // Categories & Sub-Categories
+    Route::apiResource('products', ProductController::class);
     Route::apiResource('categories', CategoryController::class);
-    Route::post('categories/change-status/{id}', [CategoryController::class, 'changeStatus']);
-
-    Route::apiResource('sub-categories', SubCategoryController::class);
-    Route::post('sub-categories/change-status/{id}', [SubCategoryController::class, 'changeStatus']);
+    Route::apiResource('sub_categories', SubCategoryController::class);
+    Route::apiResource('brands', BrandController::class);
+    Route::apiResource('suppliers', SupplierController::class);
+    Route::apiResource('imei-trackings', ImeiTrackingController::class);
 });

@@ -6,8 +6,8 @@ import LoginPage from "./page/auth/LoginPage";
 import RegisterPage from "./page/auth/RegisterPage";
 import RouteNoFound from "./page/error-page/404.jsx";
 import Error500 from "./page/error-page/500";
-import MainLayout from "./component/layout/MainLayout";
-import MainLayoutLogin from "./component/layout/MainLayoutLogin";
+import MainLayout from "./components/layout/MainLayout";
+import MainLayoutLogin from "./components/layout/MainLayoutLogin";
 import CustomerPage from "./page/customer/CustomerPage";
 import ProductPage from "./page/product/ProductPage";
 import RolePage from "./page/role/RolePage";
@@ -16,6 +16,9 @@ import "@fontsource/kantumruy-pro";
 import "@fontsource/kantumruy-pro/700.css";
 import CategoryPage from "./page/category/CategoryPage";
 import ProvincePage from "./page/province/ProvincePage";
+import SubCategoryPage from "./page/category/SubCategoryPage.jsx";
+import BrandPage from "./page/brand/BrandPage.jsx";
+import SupplierPage from "./page/supplier/SupplierPage.jsx";
 
 function App() {
   return (
@@ -34,9 +37,12 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/product" element={<ProductPage />} />
+            <Route path="/sub_category" element={<SubCategoryPage />} />
             <Route path="/role" element={<RolePage />} />
             <Route path="/category" element={<CategoryPage />} />
+            <Route path="/brand" element={<BrandPage />} />
             <Route path="/province" element={<ProvincePage />} />
+            <Route path="/supplier" element={<SupplierPage />} />
             <Route path="*" element={<RouteNoFound />} />
             <Route path="/500" element={<Error500 />} />
           </Route>

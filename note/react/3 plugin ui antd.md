@@ -8,4 +8,8 @@
 - npm install @fontsource/kantumruy-pro
 
 - npm i zustand
+// intall tailwincss
+- npm install -D tailwindcss@3.2.0 postcss autoprefixer
+-   npx tailwindcss init -p
+
 

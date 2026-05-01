@@ -21,15 +21,11 @@ class CategoryRequest extends FormRequest
      */
     public function rules(): array
         {
-        // Laravel apiResource ប្រើឈ្មោះ parameter 'category' (ឯកវចនៈ)
-        $categoryId = $this->route('category') ?? $this->route('id');
-
+        $id = $this->route('category');
         return [
-            'name'        => 'required|string|max:255',
-            'img'         => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'slug'        => 'required|string|max:255|unique:categories,slug,' . $categoryId,
-            'description' => 'nullable|string',
-            'status'      => 'nullable'
+            'name'   => 'required|string|unique:categories,name,' . $id,
+            'status' => 'required|boolean',
+            'slug'   => 'nullable|string',
         ];
     }
     }

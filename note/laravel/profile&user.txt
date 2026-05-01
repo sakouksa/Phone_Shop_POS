@@ -1,0 +1,117 @@
+1-1 Relationship
+
++ user
+    - name
+    - email
+    - password
++ profile
+    - user_id(FK)
+    - phone
+    - image
+    - type
+        // type(SYSTEM | GENERAL)
+    > php artisan make:model User -m //already exist
+    > php artisan make:model Profile -m
+    > php artisan make:controller AuthController --api
++ migration
+    * ---user_table.php
+        public function up(): void
+    {
+        Schema::create('users', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('email')->unique();
+            $table->timestamp('email_verified_at')->nullable();
+            $table->string('password');
+            $table->rememberToken();
+            $table->timestamps();
+        });
+
+        Schema::create('password_reset_tokens', function (Blueprint $table) {
+            $table->string('email')->primary();
+            $table->string('token');
+            $table->timestamp('created_at')->nullable();
+        });
+    }
+    * ---profile_table--
+        public function up(): void
+    {
+        Schema::create('profiles', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('user_id')->unique(); //one-to-one relationship
+            $table->string('phone')->nullable();
+            $table->string('address')->nullable();
+            $table->string('image')->nullable();
+            $table->string('type')->nullable();
+
+            $table->foreign('user_id')->references('id')->on('users')->OnDelete('cascade');
+            $table->timestamps();
+        });
+    }
+    * model/user.php
+    class user extends Model
+    {
+        protected $fillable = [
+            'name',
+            'email',
+            'password',
+        ];
+     //relationship in profile one-to-one
+    public function profile()
+    {
+        return $this->hasOne(Profile::class);
+    }
+    }
+    * model/profile.php
+    class Profile extends Model
+    {
+        protected $fillable = [
+            'user_id',
+            'phone',
+            'address',
+            'image',
+            'type'
+        ];
+        public function user(){
+            return $this->belongsTo(User::class);
+        }
+    }
+    * auth/controller
+    // Register a new user
+    public function register(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string',
+            'email' => 'required|string|email|unique:users,email',
+            'password' => 'required|string|min:6|confirmed',
+            'phone' => 'nullable',
+            'address' => 'nullable',
+            'type' => 'nullable',
+            'image' => 'nullable|image|mimes:jpeg,png,gif|max:2048',
+        ]);
+        //create the user
+        $user = User::create([
+            'name' => $request->name, //body json client $request->name | $request->input('name')
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+        ]);
+        //Handle the image upload if exist
+        $imagePath = null;
+        if($request->hasFile('image')){
+            $imagePath = $request->file('image')->store('profile', 'public');
+        }
+        //create the profile
+        $user->profile()->create([
+            'phone' => $request->phone,
+            'address' => $request->address,
+            'image' => $request->image,
+            'type' => $request->type,
+        ]);
+
+        Return response()->json($user->load('profile, 201));
+    }
+    //get a single user with profile
+    public function show($id){
+        $user User::with('profile)->findOrFail($id);
+        return response()->json($user);
+    }

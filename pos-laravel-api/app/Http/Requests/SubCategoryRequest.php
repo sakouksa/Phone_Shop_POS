@@ -23,12 +23,11 @@ class SubCategoryRequest extends FormRequest
     {
         $id = $this->route('sub_category') ?? $this->route('id');
         return [
-            'category_id' => 'required|integer|exists:categories,id',
+            'category_id' => 'required|exists:categories,id',
             'name'        => 'required|string|max:255',
-            'slug'        => 'required|string|max:255|unique:sub_categories,slug,' . $id,
-            'image'       => 'nullable|string', // ឬ 'nullable|image|mimes:jpeg,png,jpg|max:2048' បើ upload ឯកសារពិត
-            'description' => 'nullable|string',
-            'status'      => 'nullable|boolean',
+            'status'      => 'required|boolean',
+            'image'       => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'slug'        => 'nullable|string',
         ];
     }
 }

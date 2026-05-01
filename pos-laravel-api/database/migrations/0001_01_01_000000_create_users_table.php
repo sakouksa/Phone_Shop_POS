@@ -7,33 +7,22 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // 1. Table Users (Enhanced for POS)
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            // តំណភ្ជាប់ទៅកាន់ Table Roles
-            $table->foreignId('role_id')->nullable()->constrained('roles')->onDelete('set null');
-
-            $table->string('full_name');
-            $table->string('username')->unique(); // សម្រាប់ Login ក្នុងហាង
+            $table->string('name');
             $table->string('email')->unique();
-            $table->string('phone', 20)->nullable();
-            $table->string('image')->default('default_user.png');
-            $table->enum('status', ['active', 'inactive'])->default('active');
-
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();
         });
 
-        // 2. Table Password Resets
         Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->string('email')->primary();
             $table->string('token');
             $table->timestamp('created_at')->nullable();
         });
 
-        // 3. Table Sessions
         Schema::create('sessions', function (Blueprint $table) {
             $table->string('id')->primary();
             $table->foreignId('user_id')->nullable()->index();

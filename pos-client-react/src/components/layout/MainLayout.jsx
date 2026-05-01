@@ -11,10 +11,10 @@ import {
   ConfigProvider,
   Typography,
   Button,
-  theme, // បន្ថែម theme ពី antd
+  theme,
 } from "antd";
 
-// --- Import Icons ---
+// --- Icons ---
 import {
   UserOutlined,
   SettingOutlined,
@@ -27,8 +27,6 @@ import {
   FileTextOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-  AppstoreOutlined,
-  QuestionCircleOutlined,
   SunOutlined,
   MoonOutlined,
 } from "@ant-design/icons";
@@ -51,6 +49,7 @@ import { CiCloudOn } from "react-icons/ci";
 
 import logo from "../../assets/img/logo.png";
 import { profileStore } from "../../store/profileStore";
+import config from "../../util/config";
 
 const { Header, Content, Footer, Sider } = Layout;
 const { Text } = Typography;
@@ -59,7 +58,6 @@ function getItem(label, key, icon, children) {
   return { key, icon, children, label };
 }
 
-// --- រចនាសម្ព័ន្ធមឺនុយ (Data ដដែល) ---
 const items = [
   getItem("ផ្ទាំងគ្រប់គ្រង", "/", <MdDashboardCustomize />),
   getItem("ផ្នែកលក់ទូរស័ព្ទ", "sales", <MdPointOfSale />, [
@@ -79,7 +77,8 @@ const items = [
     ),
     getItem("គ្រប់គ្រងលេខ IMEI", "/imei-tracking", <BarcodeOutlined />),
     getItem("ប្រភេទផលិតផល", "/category", <BiCategoryAlt />),
-    getItem("ប្រភេទរង", "/sub-category", <MdOutlinePhonelinkSetup />),
+    getItem("ប្រភេទរង", "/sub_category", <MdOutlinePhonelinkSetup />),
+    getItem("ម៉ាក/ម៉ូដែល", "/brand", <MdOutlineLanguage />),
   ]),
   getItem("របាយការណ៍", "report", <FileTextOutlined />, [
     getItem("របាយការណ៍លក់", "/report/to_sales", <BsCashStack />),
@@ -126,8 +125,6 @@ const MainLayout = () => {
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
   const [openKeys, setOpenKeys] = useState([]);
-
-  // បន្ថែម State សម្រាប់ Dark/Light Mode
   const [isDarkMode, setIsDarkMode] = useState(
     localStorage.getItem("theme") === "dark",
   );
@@ -170,13 +167,13 @@ const MainLayout = () => {
     {
       key: "user-card",
       label: (
-        <div style={{ padding: "16px", textAlign: "center", width: 220 }}>
-          <Avatar src={profile?.image} size={64} icon={<UserOutlined />} />
-          <div style={{ marginTop: 10, fontWeight: "bold", fontSize: 16 }}>
+        <div className="p-4 text-center w-[220px]">
+          <Avatar src={config.image_path + profile?.image} size={64} icon={<UserOutlined />} />
+          <div className="mt-2.5 font-bold text-base text-inherit">
             {profile?.name || "អ្នកប្រើប្រាស់"}
           </div>
-          <Text type="secondary" style={{ fontSize: 12 }}>
-            {profile?.role || "Admin"}
+          <Text type="secondary" className="text-xs">
+            {profile?.type || "Admin"}
           </Text>
         </div>
       ),
@@ -205,10 +202,7 @@ const MainLayout = () => {
     <ConfigProvider
       theme={{
         algorithm: isDarkMode ? theme.darkAlgorithm : theme.defaultAlgorithm,
-        token: {
-          colorPrimary: "#3874ff",
-          borderRadius: 8,
-        },
+        token: { colorPrimary: "#3874ff", borderRadius: 8 },
         components: {
           Layout: {
             headerBg: isDarkMode ? "#141824" : "#ffffff",
@@ -224,84 +218,45 @@ const MainLayout = () => {
         },
       }}
     >
-      <Layout style={{ minHeight: "100vh" }}>
+      <Layout className="min-h-screen">
+        {/* --- Sider --- */}
         <Sider
           trigger={null}
           collapsible
           collapsed={collapsed}
-          /* --- Responsive Breakpoint --- */
           breakpoint="lg"
           collapsedWidth="80"
-          onBreakpoint={(broken) => {
-            setCollapsed(broken);
-          }}
+          onBreakpoint={setCollapsed}
           width={255}
           theme={isDarkMode ? "dark" : "light"}
-          style={{
-            borderRight: isDarkMode ? "1px solid #232e45" : "1px solid #f0f0f0",
-            position: "fixed",
-            height: "100vh",
-            left: 0,
-            zIndex: 1001,
-            background: isDarkMode ? "#141824" : "#ffffff",
-          }}
+          className={`fixed h-screen left-0 z-[1001] transition-all duration-200 border-r ${
+            isDarkMode
+              ? "border-[#232e45] bg-[#141824]"
+              : "border-[#f0f0f0] bg-white"
+          }`}
         >
-          {/* --- Logo Header Section --- */}
-          <div
-            style={{
-              height: 64,
-              display: "flex",
-              alignItems: "center",
-              padding: "0 20px",
-              marginBottom: 4,
-            }}
-          >
+          {/* Logo Section */}
+          <div className="h-16 flex items-center px-5 mb-1">
             <img
               src={logo}
               alt="logo"
-              style={{
-                width: 58,
-                height: 32,
-                borderRadius: 8,
-                objectFit: "cover",
-              }}
+              className="w-[58px] h-[32px] rounded-lg object-cover"
             />
-
             {!collapsed && (
-              <div
-                style={{
-                  marginLeft: 12,
-                  display: "flex",
-                  alignItems: "center",
-                  // បន្ថែម animation តិចៗពេលវាលោតចេញមក
-                  animation: "fadeIn 0.3s ease-in-out",
-                }}
-              >
+              <div className="ml-3 flex items-center animate-in fade-in slide-in-from-left-2 duration-300">
                 <span
-                  style={{
-                    fontWeight: 700,
-                    fontSize: 18,
-                    color: isDarkMode ? "#ffffff" : "#141824",
-                    fontFamily: "'Kantumruy Pro', sans-serif",
-                  }}
+                  className={`font-bold text-lg font-['Kantumruy_Pro'] ${isDarkMode ? "text-white" : "text-[#141824]"}`}
                 >
                   ស៊ីវិល័យ
                 </span>
-                <span
-                  style={{
-                    marginLeft: 5,
-                    fontWeight: 800,
-                    fontSize: 16,
-                    color: "#EC5325",
-                  }}
-                >
+                <span className="ml-1 font-extrabold text-base text-[#EC5325]">
                   POS
                 </span>
               </div>
             )}
           </div>
 
-          {/* --- Menu Navigation --- */}
+          {/* Menu */}
           <Menu
             mode="inline"
             openKeys={openKeys}
@@ -309,252 +264,144 @@ const MainLayout = () => {
             selectedKeys={[location.pathname]}
             items={items}
             onClick={(item) => navigate(item.key)}
-            style={{
-              borderRight: 0,
-              height: "calc(100vh - 70px)",
-              overflowY: "auto",
-              background: "transparent",
-            }}
+            className="border-r-0 h-[calc(100vh-70px)] overflow-y-auto bg-transparent custom-scrollbar"
           />
-
-          {/* --- Custom Styling --- */}
-          <style>
-            {`
-      @keyframes fadeIn {
-        from { opacity: 0; transform: translateX(-5px); }
-        to { opacity: 1; transform: translateX(0); }
-      }
-
-      .ant-layout-sider-children::-webkit-scrollbar {
-        width: 4px;
-      }
-      .ant-layout-sider-children::-webkit-scrollbar-thumb {
-        background: ${isDarkMode ? "#232e45" : "#e8e8e8"};
-        border-radius: 10px;
-      }
-      .ant-menu-item {
-        margin-top: 4px !important;
-        margin-bottom: 4px !important;
-      }
-      .ant-menu-item-selected {
-        background-color: ${isDarkMode ? "#3874ff15" : "#e3edff"} !important;
-        color: #3874ff !important;
-      }
-      .ant-menu-item-selected::after {
-        display: none; 
-      }
-    `}
-          </style>
         </Sider>
 
+        {/* --- Main Content Layout --- */}
         <Layout
+          className="transition-all duration-200"
           style={{
             marginLeft: collapsed ? 80 : 255,
-            transition: "all 0.2s",
             background: isDarkMode ? "#0f111a" : "#f9fbfd",
           }}
         >
           {/* Header */}
           <Header
-            style={{
-              padding: "0 24px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              height: 64,
-              // បន្ថែម Blur effect ដើម្បីឱ្យមើលទៅទំនើប
-              backdropFilter: "blur(8px)",
-              background: isDarkMode
-                ? "rgba(20, 24, 36, 0.8)"
-                : "rgba(255, 255, 255, 0.8)",
-              borderBottom: isDarkMode
-                ? "1px solid #232e45"
-                : "1px solid #eef0f2",
-              position: "sticky",
-              top: 0,
-              zIndex: 1000,
-              boxShadow: isDarkMode ? "none" : "0 2px 4px rgba(0,0,0,0.02)",
-            }}
+            className={`sticky top-0 z-[1000] h-16 px-6 flex items-center justify-between backdrop-blur-md border-b transition-colors duration-300 ${
+              isDarkMode
+                ? "bg-[#141824]/80 border-[#232e45]"
+                : "bg-white/80 border-[#eef0f2] shadow-sm"
+            }`}
           >
-            <Space size={24}>
-              {/* ប៊ូតុង Toggle Menu ដែលមាន Hover Effect */}
+            <div className="flex items-center gap-6">
+              {/* Toggle Button */}
               <div
                 onClick={() => setCollapsed(!collapsed)}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  width: 35,
-                  height: 35,
-                  borderRadius: "8px",
-                  cursor: "pointer",
-                  transition: "all 0.3s",
-                  background: isDarkMode ? "#1c2230" : "#f5f7fa",
-                }}
-                className="header-icon-hover"
+                className={`flex items-center justify-center w-9 h-9 rounded-lg cursor-pointer transition-all active:scale-95 ${
+                  isDarkMode ? "bg-[#1c2230]" : "bg-[#f5f7fa]"
+                }`}
               >
                 {React.createElement(
                   collapsed ? MenuUnfoldOutlined : MenuFoldOutlined,
                   {
-                    style: { fontSize: 18, color: "#3874ff" },
+                    className: "text-lg text-[#3874ff]",
                   },
                 )}
               </div>
 
-              {/* Search Bar ដែលមានស្ទីលបែប Floating */}
+              {/* Search Bar */}
               <Input
                 placeholder="ស្វែងរកអ្វីមួយនៅទីនេះ..."
-                prefix={
-                  <SearchOutlined
-                    style={{ color: "#3874ff", marginRight: 8 }}
-                  />
-                }
-                style={{
-                  width: 350,
-                  borderRadius: "10px",
-                  background: isDarkMode ? "#1c2230" : "#f0f4f8",
-                  border: "1px solid transparent",
-                  height: 40,
-                  transition: "all 0.3s",
-                }}
-                onFocus={(e) => (e.target.style.border = "1px solid #3874ff")}
-                onBlur={(e) =>
-                  (e.target.style.border = "1px solid transparent")
-                }
+                prefix={<SearchOutlined className="text-[#3874ff] mr-2" />}
+                className={`w-[350px] h-10 rounded-xl border-transparent transition-all focus:border-[#3874ff] hidden md:flex ${
+                  isDarkMode
+                    ? "bg-[#1c2230] hover:bg-[#232e45]"
+                    : "bg-[#f0f4f8] hover:bg-[#e6ebf1]"
+                }`}
               />
-            </Space>
+            </div>
 
-            <Space size={16}>
-              {/* Theme Toggle Button */}
+            <div className="flex items-center gap-4">
+              {/* Theme Toggle */}
               <Button
                 type="text"
                 shape="circle"
-                className="header-action-btn"
+                onClick={toggleTheme}
+                className={`flex items-center justify-center text-lg ${isDarkMode ? "bg-[#1c2230]" : "bg-[#f5f7fa]"}`}
                 icon={
                   isDarkMode ? (
-                    <SunOutlined style={{ color: "#fadb14" }} />
+                    <SunOutlined className="text-yellow-400" />
                   ) : (
-                    <MoonOutlined style={{ color: "#525b75" }} />
+                    <MoonOutlined className="text-[#525b75]" />
                   )
                 }
-                onClick={toggleTheme}
-                style={{
-                  fontSize: 18,
-                  background: isDarkMode ? "#1c2230" : "#f5f7fa",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
               />
 
-              {/* Notification Badge */}
+              {/* Notifications */}
               <Badge count={5} size="small" offset={[-2, 5]} color="#ff4d4f">
                 <Button
                   type="text"
                   shape="circle"
-                  icon={
-                    <BellOutlined style={{ color: "#525b75", fontSize: 20 }} />
-                  }
-                  style={{
-                    background: isDarkMode ? "#1c2230" : "#f5f7fa",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
+                  className={`flex items-center justify-center ${isDarkMode ? "bg-[#1c2230]" : "bg-[#f5f7fa]"}`}
+                  icon={<BellOutlined className="text-xl text-[#525b75]" />}
                 />
               </Badge>
 
-              <div
-                style={{
-                  width: "1px",
-                  height: "24px",
-                  background: "#e3e6ed",
-                  margin: "0 8px",
-                }}
-              />
+              <div className="w-[1px] h-6 bg-[#e3e6ed] mx-2" />
 
-              {/* User Profile Section */}
+              {/* Profile Dropdown */}
               <Dropdown
                 menu={{ items: userMenuItems }}
                 trigger={["click"]}
                 placement="bottomRight"
-                arrow={{ pointAtCenter: true }}
+                arrow
               >
-                <Space
-                  style={{
-                    cursor: "pointer",
-                    padding: "4px 8px",
-                    borderRadius: "8px",
-                    transition: "all 0.3s",
-                  }}
-                  className="user-dropdown-hover"
-                >
+                <div className="flex items-center gap-2 p-1 rounded-lg cursor-pointer hover:bg-black/5 transition-colors">
                   <Avatar
-                    src={profile?.image}
+                    src={config.image_path + profile?.image}
                     size={38}
-                    style={{
-                      border: "2px solid #3874ff",
-                      boxShadow: "0 2px 8px rgba(56, 116, 255, 0.2)",
-                    }}
+                    className="border-2 border-[#3874ff] shadow-[0_2px_8px_rgba(56,116,255,0.2)]"
                     icon={<UserOutlined />}
                   />
                   {!collapsed && (
-                    <div
-                      style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        lineHeight: "1.2",
-                      }}
-                    >
+                    <div className="flex flex-col leading-tight">
                       <Text
                         strong
-                        style={{
-                          fontSize: "14px",
-                          color: isDarkMode ? "#fff" : "#141824",
-                        }}
+                        className={`text-sm ${isDarkMode ? "text-white" : "text-[#141824]"}`}
                       >
                         {profile?.name}
                       </Text>
-                      <Text type="secondary" style={{ fontSize: "11px" }}>
+                      <Text type="secondary" className="text-[11px]">
                         {profile?.role}
                       </Text>
                     </div>
                   )}
-                </Space>
+                </div>
               </Dropdown>
-            </Space>
+            </div>
           </Header>
 
           {/* Page Content */}
-          <Content
-            style={{ padding: "24px", minHeight: "calc(100vh - 128px)" }}
-          >
+          <Content className="p-6 min-h-[calc(100vh-128px)]">
             <div
-              style={{
-                maxWidth: 1600,
-                margin: "0 auto",
-                background: isDarkMode ? "#141824" : "#ffffff",
-                padding: "20px",
-                borderRadius: "12px",
-                boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
-              }}
+              className={`max-w-[1600px] mx-auto p-5 rounded-xl shadow-sm border transition-colors ${
+                isDarkMode
+                  ? "bg-[#141824] border-[#232e45]"
+                  : "bg-white border-transparent"
+              }`}
             >
               <Outlet />
             </div>
           </Content>
 
-          <Footer
-            style={{
-              textAlign: "center",
-              background: "transparent",
-              color: "#94a3b8",
-            }}
-          >
-            <b>ប្រព័ន្ធគ្រប់គ្រងហាងទូរស័ព្ទ</b> ©{new Date().getFullYear()} -
-            ឆ្លាតវៃ និងទំនើប
+          <Footer className="text-center bg-transparent text-slate-400 py-6">
+            <span className="font-bold">ប្រព័ន្ធគ្រប់គ្រងហាងទូរស័ព្ទ</span> ©
+            {new Date().getFullYear()} - ឆ្លាតវៃ និងទំនើប
           </Footer>
         </Layout>
       </Layout>
+
+      {/* Tailwind Custom Utilities for Ant Design Overrides */}
+      <style>{`
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { 
+            background: ${isDarkMode ? "#232e45" : "#e8e8e8"}; 
+            border-radius: 10px; 
+        }
+        .ant-menu-item { margin-top: 4px !important; margin-bottom: 4px !important; }
+        .ant-menu-item-selected::after { display: none !important; }
+      `}</style>
     </ConfigProvider>
   );
 };

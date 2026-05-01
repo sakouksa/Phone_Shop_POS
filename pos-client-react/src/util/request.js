@@ -4,13 +4,21 @@ import { profileStore } from "../store/profileStore";
 
 export const request = (url = "", method = "", data = {}) => {
   let access_token = profileStore.getState().access_token;
+  let headers = {
+    "Content-Type": "application/json", //json data
+  };
+  if (data instanceof FormData) {
+    headers = {
+      "Content-Type": "multipart/form-data", // form data
+    };
+  }
   return axios({
     url: config.base_url + url,
     method: method, //"get","post" ,"put","delete"
     data: data,
     headers: {
       Accept: "application/json",
-      "Content-Type": "application/json",
+      ...headers,
       Authorization: "Bearer" + access_token,
     },
   })
@@ -26,9 +34,10 @@ export const request = (url = "", method = "", data = {}) => {
         let errors = {
           message: data?.message,
         };
-        // --- ផ្នែកបន្ថែមសម្រាប់ Error 500 ---
         if (status == 500) {
-          window.location.href = "/500";
+          //alert message error server
+          errors.message =
+            "500 : មានបញ្ហាបច្ចេកទេសក្នុងប្រព័ន្ធ សូមព្យាយាមម្តងទៀត!";
           return;
         }
 
@@ -46,9 +55,7 @@ export const request = (url = "", method = "", data = {}) => {
           status: status,
           errors: errors,
         };
-        }
-        window.location.href = "/500";
-      // ករណីគ្មាន Internet ឬ Server បិទ
+      }
       return {
         error: true,
         errors: { message: "មិនអាចតភ្ជាប់ទៅកាន់ Server បានទេ!" },

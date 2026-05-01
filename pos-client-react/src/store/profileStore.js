@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { createJSONStorage, persist } from "zustand/middleware";
 
 export const profileStore = create(
   persist(
@@ -11,6 +11,9 @@ export const profileStore = create(
       setAccessToken: (params) => set((pre) => ({ access_token: params })),
       logout: () => set((pre) => ({ profile: null })),
     }),
-    { name: "user-profile" },
+    {
+      name: "user-profile",
+      storage: createJSONStorage(() => sessionStorage), // (optional) by default, 'localStorage' is used
+    },
   ),
 );

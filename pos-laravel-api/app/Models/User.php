@@ -13,15 +13,11 @@ class User extends Authenticatable implements JWTSubject // អនុវត្�
     use HasFactory, Notifiable;
 
     protected $fillable = [
-        'role_id',
-        'full_name',
-        'username',
-        'email',
-        'phone',
-        'image',
-        'status',
-        'password',
+        "name",
+        "email",
+        "password",
     ];
+    
 
     protected $hidden = [
         'password',
@@ -58,5 +54,10 @@ class User extends Authenticatable implements JWTSubject // អនុវត្�
     public function role(): BelongsTo
     {
         return $this->belongsTo(Role::class, 'role_id');
+    }
+    //relationship user with profile
+    public function profile()
+    {
+        return $this->hasOne(Profile::class, 'user_id');
     }
 }

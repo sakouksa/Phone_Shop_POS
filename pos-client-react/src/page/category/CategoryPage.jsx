@@ -24,7 +24,7 @@ import { dateClient } from "../../util/helper";
 import { useNavigate } from "react-router-dom"; // បន្ថែមនេះ
 
 function CategoryPage() {
-const navigate = useNavigate();
+  const navigate = useNavigate();
   const [formRef] = Form.useForm();
   const [validate, setValidate] = useState({});
   const [state, setState] = useState({
@@ -56,7 +56,7 @@ const navigate = useNavigate();
 
     const res = await request("categories" + query_param, "get");
     if (res && res.status === 500) {
-      navigate("/500");
+      message.error("មានបញ្ហាក្នុងការទាញយកទិន្នន័យ ៥០០!");
       return;
     }
     if (res && !res.errors) {
@@ -82,7 +82,18 @@ const navigate = useNavigate();
     formRef.resetFields();
     setValidate({});
   };
-
+  //auto change slug
+  const handleNameChange = (e) => {
+    const nameValue = e.target.value;
+    const slugValue = nameValue
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "_") // បម្លែងអក្សរទៅជាតួអក្សរ និងលេខ និងប្តូរទៅជា "_"
+      .replace(/(^-|-$)+/g, ""); /// លុប "_" នៅចុងក្រោយនិងចុងដើម
+    formRef.setFieldsValue({
+      name: nameValue,
+      slug: slugValue,
+    });
+  };
   const onFinish = async (item) => {
     let url = "categories";
     let method = "post";
@@ -190,7 +201,10 @@ const navigate = useNavigate();
             {...validate.name}
             rules={[{ required: true, message: "សូមបញ្ចូលឈ្មោះប្រភេទ!" }]}
           >
-            <Input placeholder="បញ្ចូលឈ្មោះប្រភេទ" />
+            <Input
+              placeholder="បញ្ចូលឈ្មោះប្រភេទ"
+              onChange={handleNameChange}
+            />
           </Form.Item>
           <Form.Item
             label="Slug"
@@ -200,9 +214,7 @@ const navigate = useNavigate();
           >
             <Input placeholder="បញ្ចូល slug" />
           </Form.Item>
-          <Form.Item label="ការពិពណ៌នា" name="description">
-            <Input.TextArea placeholder="ព័ត៌មានបន្ថែម..." />
-          </Form.Item>
+
           <Form.Item label="ស្ថានភាព" name="status" initialValue={1}>
             <Select
               placeholder="ជ្រើសរើសស្ថានភាព"

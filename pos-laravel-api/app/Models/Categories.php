@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Categories extends Model
 {
@@ -12,27 +13,22 @@ class Categories extends Model
     protected $table = 'categories';
 
     protected $fillable = [
-        'name',
-        'slug',
-        'image',
-        'description',
-        'parent_id',
-        'status',
+        "name",
+        "slug",
+        "status",
     ];
-
     /**
-     * ទាញយក Category មេ (Parent)
+     * Relationship ទៅកាន់ Sub_categories (One to Many)
      */
-    public function parent()
+    public function subCategories()
     {
-        return $this->belongsTo(Categories::class, 'parent_id');
+        return $this->hasMany(Sub_categories::class, 'category_id');
     }
-
     /**
-     * ទាញយក Sub-categories (Children)
+     * Relationship ទៅកាន់ Product (One to Many)
      */
-    public function children()
+    public function products(): HasMany
     {
-        return $this->hasMany(Categories::class, 'parent_id');
+        return $this->hasMany(Product::class, 'category_id');
     }
 }

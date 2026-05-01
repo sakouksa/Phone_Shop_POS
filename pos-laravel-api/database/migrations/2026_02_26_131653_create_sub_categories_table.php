@@ -14,13 +14,10 @@ return new class extends Migration
     {
         Schema::create('sub_categories', function (Blueprint $table) {
             $table->id();
-            // បង្កើត Foreign Key ភ្ជាប់ទៅកាន់ Table categories
-            $table->foreignId('category_id')->constrained('categories')->onDelete('cascade');
-
-            $table->string('name'); // ឧទាហរណ៍៖ iPhone 15 Series, Fast Chargers
-            $table->string('slug')->unique();
+            $table->foreignId('category_id')->constrained("categories")->onDelete('cascade');
+            $table->string('name');
+            $table->string('slug')->nullable();
             $table->string('image')->nullable();
-            $table->text('description')->nullable();
             $table->boolean('status')->default(true);
             $table->timestamps();
         });
