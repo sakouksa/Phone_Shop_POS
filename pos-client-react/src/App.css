@@ -1,3 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Kantumruy+Pro:ital,wght@0,100..700;1,100..700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 #root {
   width: 100%;
   min-height: 100vh;
@@ -7,12 +13,10 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  /* បន្ថែមដើម្បីឱ្យវត្ថុនៅចំកណ្តាលជួរដេក */
   padding: 0 15px;
   background-color: #fff;
   height: 80px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-  /* បន្ថែមស្រមោលតិចៗឱ្យស្អាត */
 }
 
 .txt-brandname {
@@ -23,7 +27,6 @@
 
 .txt-username {
   font-size: 16px;
-  /* កែពី 20px មក 16px ដើម្បីឱ្យសមសួន */
   font-weight: bold;
   line-height: 1.2;
 }
@@ -38,11 +41,9 @@
   width: 45px;
   height: 45px;
   border-radius: 50%;
-  /* ធ្វើឱ្យរូបភាព Profile មូល */
   object-fit: cover;
 }
 
-/* រក្សាទុក Animation និង Style ផ្សេងទៀតរបស់អ្នក */
 .logo {
   height: 6em;
   padding: 1.5em;
@@ -74,4 +75,110 @@
   display: flex;
   justify-content: space-between;
   margin-bottom: 10px;
+}
+
+:root {
+  font-family: "Kantumruy Pro", system-ui, -apple-system, sans-serif;
+  line-height: 1.7;
+  font-weight: 400;
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  font-family: "Kantumruy Pro", sans-serif;
+  font-size: 15px;
+}
+
+input,
+button,
+select,
+textarea,
+optgroup,
+.ant-input,
+.ant-select,
+.ant-btn,
+.ant-table {
+  font-family: "Kantumruy Pro", sans-serif !important;
+}
+
+.ant-message,
+.ant-message-notice,
+.ant-message-custom-content,
+.ant-message-custom-content>span {
+  font-family: "Kantumruy Pro", sans-serif !important;
+}
+
+.ant-notification,
+.ant-notification-notice,
+.ant-notification-notice-message,
+.ant-notification-notice-description,
+.ant-notification-notice-close {
+  font-family: "Kantumruy Pro", sans-serif !important;
+}
+
+.ant-modal,
+.ant-modal-content,
+.ant-modal-header,
+.ant-modal-title,
+.ant-modal-confirm-body {
+  font-family: "Kantumruy Pro", sans-serif !important;
+}
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+  transition: color 0.3s;
+}
+
+a:hover {
+  color: #535bf2;
+}
+
+h1 {
+  font-size: 2.5em;
+  line-height: 1.2;
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+
+button:hover {
+  border-color: #646cff;
+}
+
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+
+  a:hover {
+    color: #747bff;
+  }
+
+  button {
+    background-color: #f9f9f9;
+    color: #213547;
+    border: 1px solid #ddd;
+  }
 }

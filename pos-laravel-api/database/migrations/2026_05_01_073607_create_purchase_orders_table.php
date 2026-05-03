@@ -33,8 +33,7 @@ return new class extends Migration
 
             // Payment
             $table->enum('payment_status', ['unpaid', 'partial', 'paid'])->default('unpaid');
-            $table->string('payment_method')->nullable();
-
+            $table->foreign('payment_method_id')->references('id')->on('payment_methods')->onDelete('cascade');
             // Additional info
             $table->foreignId('created_by_id')->nullable()->constrained('users')->nullOnDelete();
             $table->text('notes')->nullable();

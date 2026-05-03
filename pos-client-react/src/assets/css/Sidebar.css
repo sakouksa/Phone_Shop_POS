@@ -1,0 +1,64 @@
+
+.dark-menu .ant-menu-item-selected {
+    background: linear-gradient(135deg, #ec5325 0%, #a13010 100%) !important;
+    color: #ffffff !important;
+    border-radius: 8px;
+}
+
+.dark-menu .ant-menu-item-selected svg,
+.dark-menu .ant-menu-item-selected .anticon {
+    color: #ffffff !important;
+}
+
+.light-menu .ant-menu-item-selected {
+    background: #fdf2e9 !important;
+    color: #ec5325 !important;
+    border-radius: 8px;
+}
+
+.light-menu .ant-menu-item-selected svg,
+.light-menu .ant-menu-item-selected .anticon {
+    color: #ec5325 !important;
+}
+
+.ant-menu-item,
+.ant-menu-submenu-title {
+    border-radius: 6px !important;
+    margin-bottom: 4px !important;
+    transition: all 0.2s ease-in-out !important;
+}
+
+.ant-menu-item:hover,
+.ant-menu-submenu-title:hover {
+    background-color: rgba(236, 83, 37, 0.08) !important;
+    color: #ec5325 !important;
+}
+
+.ant-menu-item:hover svg,
+.ant-menu-submenu-title:hover svg,
+.ant-menu-item:hover .anticon,
+.ant-menu-submenu-title:hover .anticon {
+    color: #ec5325 !important;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+    width: 5px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(136, 136, 136, 0.3);
+    border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(236, 83, 37, 0.5);
+}
+
+.ant-layout-sider-children {
+    display: flex;
+    flex-direction: column;
+}

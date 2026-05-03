@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Imei_Trackings extends Model
+class ImeiTrackings extends Model
 {
     use HasFactory;
 
@@ -39,7 +39,7 @@ class Imei_Trackings extends Model
 
     public function purchaseOrder(): BelongsTo
     {
-        return $this->belongsTo(Purchase_Orders::class, 'purchase_id');
+        return $this->belongsTo(PurchaseOrders::class, 'purchase_id');
     }
 
     public function sale(): BelongsTo

@@ -1,6 +1,10 @@
 <?php
 
 use App\Http\Controllers\ImeiTrackingController;
+use App\Http\Controllers\PaymentMethodController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\PurchaseOrderController;
+use App\Http\Controllers\PurchaseOrderItemController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
@@ -27,4 +31,7 @@ Route::middleware('auth:api')->group(function () {
     Route::apiResource('brands', BrandController::class);
     Route::apiResource('suppliers', SupplierController::class);
     Route::apiResource('imei-trackings', ImeiTrackingController::class);
+    Route::apiResource('purchase-orders', PurchaseOrderController::class);
+    Route::apiResource('purchase-order-items', PurchaseOrderItemController::class);
+    Route::apiResource('payment-methods', PaymentMethodController::class);
 });

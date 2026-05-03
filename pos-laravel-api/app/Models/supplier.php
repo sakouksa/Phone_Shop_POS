@@ -23,6 +23,11 @@ class supplier extends Model
      */
     public function imeiTrackings(): HasMany
     {
-        return $this->hasMany(Imei_Trackings::class, 'supplier_id');
+        return $this->hasMany(ImeiTrackings::class, 'supplier_id');
+    }
+
+    public function purchaseOrders(): HasMany
+    {
+        return $this->hasMany(PurchaseOrder::class, 'supplier_id');
     }
 }

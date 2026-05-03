@@ -25,16 +25,21 @@ class ProductRequest extends FormRequest
         $productId = $this->route('product'); // យក ID របស់ Product ពេល Update
 
         return [
-            'name'        => 'required|string|max:255',
-            'category_id' => 'required|exists:categories,id',
-            'brand_id'    => 'required|exists:brands,id',
+            'name'            => 'required|string|max:255',
+            'category_id'     => 'required|exists:categories,id',
+            'sub_category_id' => 'required|exists:sub_categories,id',
+            'brand_id'        => 'required|exists:brands,id',
+            'sku'             => 'required|string|unique:products,sku' . ($isUpdate ? ',' . $productId : ''),
 
-            'sku'         => 'required|string|unique:products,sku' . ($isUpdate ? ',' . $productId : ''),
+            'cost_price'      => 'required|numeric|min:0',
+            'sale_price'      => 'required|numeric|min:0',
+            'stock_quantity'  => 'required|integer|min:0',
 
-            'cost_price'  => 'required|numeric|min:0',
-            'sale_price'  => 'required|numeric|min:0',
-            'stock_qty'   => 'required|integer|min:0',
-            'image'       => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'min_stock_alert' => 'nullable|integer|min:0',
+            'has_imei'        => 'nullable|boolean',
+            'status'          => 'nullable|string|in:active,inactive',
+            'description'     => 'nullable|string',
+            'image'           => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ];
     }
 }

@@ -14,7 +14,7 @@ import {
 import { CiEdit } from "react-icons/ci";
 import { AiOutlinePlus } from "react-icons/ai";
 import { RiSave3Fill } from "react-icons/ri";
-import { SearchOutlined, ExclamationCircleFilled } from "@ant-design/icons";
+import { SearchOutlined, ExclamationCircleFilled, FilterOutlined } from "@ant-design/icons";
 import { MdDelete } from "react-icons/md";
 import { BiSolidEditAlt } from "react-icons/bi";
 
@@ -150,6 +150,7 @@ function SupplierPage() {
                 }
                 placeholder="ស្វែងរកអ្នកផ្គត់ផ្គង់..."
                 className="w-full sm:w-64 md:w-72"
+                onSearch={handleFilter}
               />
               <Select
                 allowClear
@@ -166,10 +167,10 @@ function SupplierPage() {
               <Button
                 type="primary"
                 onClick={handleFilter}
-                icon={<SearchOutlined />}
+                icon={<FilterOutlined />}
                 className="w-full sm:w-auto"
               >
-                ស្វែងរក
+                តម្រងទិន្នន័យ
               </Button>
             </div>
           </div>
@@ -268,7 +269,7 @@ function SupplierPage() {
             dataSource={state.list}
             scroll={{ x: 900 }}
             columns={[
-              { title: "ឈ្មោះ", dataIndex: "name", key: "name" },
+              { title: "ឈ្មោះអ្នកផ្គត់ផ្គង់", dataIndex: "name", key: "name" },
               {
                 title: "អ្នកទំនាក់ទំនង",
                 dataIndex: "contact_person",

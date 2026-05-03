@@ -39,9 +39,9 @@ class Product extends Model
     /**
      * Relationship ទៅកាន់ Sub Category (One to Many - Inverse)
      */
-    public function subCategory(): BelongsTo
+    public function sub_category(): BelongsTo
     {
-        return $this->belongsTo(Sub_categories::class, 'sub_category_id');
+        return $this->belongsTo(SubCategories::class, 'sub_category_id');
     }
 
     /**
@@ -57,6 +57,13 @@ class Product extends Model
      */
     public function imeiTrackings(): HasMany
     {
-        return $this->hasMany(Imei_Trackings::class, 'product_id');
+        return $this->hasMany(ImeiTrackings::class, 'product_id');
+    }
+    /**
+     * Relationship ទៅកាន់ Purchase Order Item (One to Many)
+     */
+    public function purchaseOrderItems(): HasMany
+    {
+        return $this->hasMany(PurchaseOrderItem::class);
     }
 }

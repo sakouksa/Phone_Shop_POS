@@ -19,6 +19,9 @@ import ProvincePage from "./page/province/ProvincePage";
 import SubCategoryPage from "./page/category/SubCategoryPage.jsx";
 import BrandPage from "./page/brand/BrandPage.jsx";
 import SupplierPage from "./page/supplier/SupplierPage.jsx";
+import ImeiTrackingPage from "./page/imei-tracking/ImeiTrackingPage.jsx";
+import PurchaseOrderPage from "./page/purchase-order/PurchaseOrderPage.jsx";
+import PurchaseOrderItemPage from "./page/purchase-order/PurchaseOrderItemPage.jsx";
 
 function App() {
   return (
@@ -43,6 +46,9 @@ function App() {
             <Route path="/brand" element={<BrandPage />} />
             <Route path="/province" element={<ProvincePage />} />
             <Route path="/supplier" element={<SupplierPage />} />
+            <Route path="/imei_tracking" element={<ImeiTrackingPage />} />
+            <Route path="/purchase_orders" element={<PurchaseOrderPage />} />
+            <Route path="/purchase_order_items" element={<PurchaseOrderItemPage />} />
             <Route path="*" element={<RouteNoFound />} />
             <Route path="/500" element={<Error500 />} />
           </Route>

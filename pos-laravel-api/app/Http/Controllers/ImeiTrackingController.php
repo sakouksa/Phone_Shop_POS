@@ -2,37 +2,55 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Imei_Trackings;
+use App\Models\ImeiTrackings;
 use App\Http\Requests\ImeiTrackingRequest;
+use App\Models\Product;
+use App\Models\Purchase_Orders;
+use App\Models\PurchaseOrders;
+use App\Models\Supplier;
+use App\Models\Sale;
 use Illuminate\Http\Request;
 
 class ImeiTrackingController extends Controller
 {
-    // Filter data with text search and status
     public function index(Request $req)
     {
-        // ហៅទាញយកទិន្នន័យទាំងអស់ និង Relation របស់វា
-        $imei = Imei_Trackings::with(['product', 'supplier', 'purchaseOrder', 'sale']);
+        $query = ImeiTrackings::query();
 
-        if ($req->filled("text_search")) {
-            $imei->where("imei_number", "LIKE", "%" . $req->text_search . "%");
+        if ($req->filled('text_search')) {
+            $query->where('imei_number', 'like', '%' . $req->input('text_search') . '%');
+        }
+        if ($req->filled('product_id')) {
+            $query->where('product_id', $req->input('product_id'));
+        }
+        if ($req->filled('supplier_id')){
+            $query->where('supplier_id', $req->input('supplier_id'));
+        }
+        if ($req->filled('purchase_id')){
+            $query->where('purchase_id', $req->input('purchase_id'));
+        }
+        if ($req->filled('sale_id')){
+            $query->where('sale_id', $req->input('sale_id'));
+        }
+        if ($req->filled('status')) {
+            $query->where('status', $req->input('status'));
         }
 
-        if ($req->filled("status")) {
-            $imei->where("status", $req->status);
-        }
+        $imei_tracking = $query->with(['product', 'supplier', 'purchaseOrder', "sale"])->orderBy('id', 'desc')->get();
 
         return response()->json([
-            'list' => $imei->orderBy('id', 'desc')->get(),
+            'list' => $imei_tracking,
+            "product" => Product::all(),
+            "supplier" => Supplier::all(),
+            "purchase" => PurchaseOrders::all(),
+            "sale" => Sale::all(),
         ]);
     }
 
-    // store data
     public function store(ImeiTrackingRequest $request)
     {
         $data = $request->validated();
-
-        $imei = Imei_Trackings::create($data);
+        $imei = ImeiTrackings::create($data);
 
         return response()->json([
             'data'    => $imei,
@@ -40,30 +58,15 @@ class ImeiTrackingController extends Controller
         ]);
     }
 
-    // show data by id
-    public function show($id)
-    {
-        $imei = Imei_Trackings::with(['product', 'supplier', 'purchaseOrder', 'sale'])->find($id);
-
-        if ($imei) {
-            return response()->json([
-                'data' => $imei,
-            ]);
-        }
-        return response()->json(['message' => 'រកមិនឃើញទិន្នន័យ'], 404);
-    }
-
-    // update data
     public function update(ImeiTrackingRequest $request, $id)
     {
-        $imei = Imei_Trackings::find($id);
+        $imei = ImeiTrackings::find($id);
 
         if (!$imei) {
-            return response()->json(['message' => 'រកមិនឃើញทิน្នន័យ'], 404);
+            return response()->json(['message' => 'រកមិនឃើញទិន្នន័យ'], 404);
         }
 
         $data = $request->validated();
-
         $imei->update($data);
 
         return response()->json([
@@ -72,10 +75,9 @@ class ImeiTrackingController extends Controller
         ]);
     }
 
-    // delete data
     public function destroy($id)
     {
-        $imei = Imei_Trackings::find($id);
+        $imei = ImeiTrackings::find($id);
         if ($imei) {
             $imei->delete();
             return response()->json(['success' => true, 'message' => 'លុបជោគជ័យ']);

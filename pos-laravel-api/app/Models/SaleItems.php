@@ -2,13 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Sale_Items extends Model
+class SaleItems extends Model
 {
-    use HasFactory;
 
     protected $fillable = [
         'sale_id',

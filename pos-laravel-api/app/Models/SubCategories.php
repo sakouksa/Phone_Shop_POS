@@ -2,13 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Sub_Categories extends Model
+class SubCategories extends Model
 {
-    use HasFactory;
 
     protected $table = 'sub_categories';
 
@@ -23,5 +22,9 @@ class Sub_Categories extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(Categories::class, 'category_id');
+    }
+    public function products(): HasMany
+    {
+        return $this->hasMany(Product::class);
     }
 }

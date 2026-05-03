@@ -27,21 +27,23 @@ class Sale extends Model
         'notes',
     ];
 
-    // ទំនាក់ទំនងទៅកាន់ Customer
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);
     }
 
-    // ទំនាក់ទំនងទៅកាន់ User (អ្នកលក់)
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    // ទំនាក់ទំនង 1 វិក្កយបត្រមានទំនិញច្រើន
-    public function items(): HasMany
+    public function saleItems(): HasMany
     {
-        return $this->hasMany(Sale_Items::class);
+        return $this->hasMany(SaleItems::class);
+    }
+
+    public function imeiTrackings(): HasMany
+    {
+        return $this->hasMany(ImeiTrackings::class);
     }
 }

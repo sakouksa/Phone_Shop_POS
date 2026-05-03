@@ -8,7 +8,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class User extends Authenticatable implements JWTSubject // អនុវត្ត (Implement) JWTSubject
+class User extends Authenticatable implements JWTSubject
 {
     use HasFactory, Notifiable;
 
@@ -17,7 +17,7 @@ class User extends Authenticatable implements JWTSubject // អនុវត្�
         "email",
         "password",
     ];
-    
+
 
     protected $hidden = [
         'password',

@@ -22,7 +22,7 @@ class Categories extends Model
      */
     public function subCategories()
     {
-        return $this->hasMany(Sub_categories::class, 'category_id');
+        return $this->hasMany(SubCategories::class, 'category_id');
     }
     /**
      * Relationship ទៅកាន់ Product (One to Many)

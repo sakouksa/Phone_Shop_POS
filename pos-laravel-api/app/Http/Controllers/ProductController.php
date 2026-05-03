@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Brand;
+use App\Models\Categories;
 use App\Models\Product;
 use App\Http\Requests\ProductRequest; // ហៅ Request មកប្រើ
+use App\Models\Sub_Categories;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -13,23 +16,27 @@ class ProductController extends Controller
     // ទាញយកទិន្នន័យ
     public function index(Request $request)
     {
-        $products = Product::with(['category', 'brand', 'subCategory']);
+        $query = Product::query(); //ORM Eloquent
 
         if ($request->filled('text_search')) {
-            $products->where('name', 'LIKE', '%' . $request->text_search . '%')
+            $query->where('name', 'LIKE', '%' . $request->text_search . '%')
                 ->orWhere('sku', 'LIKE', '%' . $request->text_search . '%');
         }
 
         if ($request->filled('category_id')) {
-            $products->where('category_id', $request->category_id);
+            $query->where('category_id', $request->category_id);
         }
 
         if ($request->filled('brand_id')) {
-            $products->where('brand_id', $request->brand_id);
+            $query->where('brand_id', $request->brand_id);
         }
+        $product = $query->with(['category', 'brand', 'sub_category'])->orderBy('id', 'desc')->get();
 
         return response()->json([
-            'list' => $products->orderBy('id', 'desc')->get(),
+            'list' => $product,
+            "category" => Categories::all(),
+            "brand" => Brand::all(),
+            "sub_category" => Sub_Categories::all(),
         ]);
     }
 

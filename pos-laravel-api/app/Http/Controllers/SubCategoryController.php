@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Sub_categories;
 use App\Models\Categories;
 use App\Http\Requests\SubCategoryRequest;
+use App\Models\SubCategories;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Str;
@@ -15,7 +15,7 @@ class SubCategoryController extends Controller
     // Get list of subcategories with filters and pagination
     public function index(Request $request)
     {
-        $query = Sub_categories::query(); // ORM Eloquent
+        $query = SubCategories::query(); // ORM Eloquent
 
         if ($request->has('id')) {
             $query->where("id", "=", $request->input("id"));
@@ -49,7 +49,7 @@ class SubCategoryController extends Controller
             $data['image'] = $request->file('image')->store('sub_categories', 'public');
         }
 
-        $sub = Sub_categories::create($data);
+        $sub = Subcategories::create($data);
         return response()->json([
             "message" => "រក្សាទុកអនុប្រភេទបានជោគជ័យ!",
             "data"    => $sub,
@@ -59,7 +59,7 @@ class SubCategoryController extends Controller
     // Show a single subcategory
     public function show(string $id)
     {
-        $sub = Sub_categories::with('category')->find($id);
+        $sub = SubCategories::with('category')->find($id);
         if (!$sub) {
             return response()->json([
                 "message" => "រកមិនឃើញទិន្នន័យ",
@@ -73,7 +73,7 @@ class SubCategoryController extends Controller
     // Update the specified resource in storage
     public function update(SubCategoryRequest $request, string $id)
     {
-        $sub = Sub_categories::find($id);
+        $sub = SubCategories::find($id);
         if (!$sub) {
             return response()->json([
                 "message" => "រកមិនឃើញទិន្នន័យ",
@@ -107,7 +107,7 @@ class SubCategoryController extends Controller
     // Delete a subcategory
     public function destroy(string $id)
     {
-        $sub = Sub_categories::find($id);
+        $sub = SubCategories::find($id);
 
         if (!$sub) {
             return response()->json([
