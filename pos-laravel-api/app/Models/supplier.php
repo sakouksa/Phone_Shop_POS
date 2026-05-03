@@ -18,16 +18,13 @@ class supplier extends Model
         'status',
     ];
 
-    /**
-     * Relationship ទៅកាន់ ImeiTracking (១ ទៅ ច្រើន)
-     */
-    public function imeiTrackings(): HasMany
-    {
-        return $this->hasMany(ImeiTrackings::class, 'supplier_id');
-    }
-
     public function purchaseOrders(): HasMany
     {
-        return $this->hasMany(PurchaseOrder::class, 'supplier_id');
+        return $this->hasMany(PurchaseOrder::class);
+    }
+
+    public function imeiTrackings(): HasMany
+    {
+        return $this->hasMany(ImeiTrackings::class);
     }
 }

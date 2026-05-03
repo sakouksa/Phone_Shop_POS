@@ -20,7 +20,7 @@ return new class extends Migration
 
             $table->integer('quantity');
             $table->decimal('unit_price', 10, 2);
-            $table->decimal('discount_item', 10, 2)->default(0.00);
+            $table->decimal('discount_item', 10, 2)->default(0);
             $table->decimal('total_line_price', 10, 2);
             $table->timestamps();
         });

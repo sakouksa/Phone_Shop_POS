@@ -13,12 +13,10 @@ return new class extends Migration
     {
         Schema::create('roles', function (Blueprint $table) {
             $table->id();
-            // name Role (example Admin, Cashier, Technician)
-            $table->string('role_name', 50)->unique();
-
-            // Promistion JSON (example ["view_reports", "create_product"])
-            $table->json('permissions')->nullable();
-
+            $table->string('name')->unique();
+            $table->string('code')->unique();
+            $table->text('description')->nullable();
+            $table->enum('status', ['active', 'inactive'])->default('active');
             $table->timestamps();
         });
     }

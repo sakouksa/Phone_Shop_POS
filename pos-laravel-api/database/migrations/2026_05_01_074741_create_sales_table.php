@@ -14,24 +14,17 @@ return new class extends Migration
         Schema::create('sales', function (Blueprint $table) {
             $table->id();
             $table->string('invoice_number')->unique();
-
-            // Foreign Keys
-            $table->unsignedBigInteger('customer_id')->nullable();
-            $table->unsignedBigInteger('user_id')->nullable();
-
-            // Financials
+            $table->foreignId('customer_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->decimal('sub_total', 10, 2);
-            $table->decimal('discount', 10, 2)->default(0.00);
-            $table->decimal('tax_amount', 10, 2)->default(0.00);
+            $table->decimal('discount', 10, 2)->default(0);
+            $table->decimal('tax_amount', 10, 2)->default(0);
             $table->decimal('grand_total', 10, 2);
-
-            // Payment
             $table->decimal('amount_received', 10, 2);
-            $table->decimal('change', 10, 2)->default(0.00);
-            $table->enum('payment_method', ['cash', 'bank_transfer', 'card', 'split'])->default('cash');
-
-            $table->enum('status', ['completed', 'pending', 'cancelled'])->default('completed');
-
+            $table->decimal('change', 10, 2)->default(0);
+            $table->unsignedBigInteger('payment_method_id');
+            $table->foreign('payment_method_id')->references('id')->on('payment_methods')->onDelete('cascade');
+            $table->enum('status', ['completed', 'canceled'])->default('completed');
             $table->text('notes')->nullable();
             $table->timestamps();
         });

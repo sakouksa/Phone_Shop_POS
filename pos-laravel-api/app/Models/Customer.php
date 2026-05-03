@@ -24,6 +24,11 @@ class Customer extends Model
     // ទំនាក់ទំនង 1 Customer អាចមាន Sale (វិក្កយបត្រ) ច្រើន
     public function sales(): HasMany
     {
-        return $this->hasMany(Sale::class, 'customer_id');
+        return $this->hasMany(Sale::class);
+    }
+
+    public function exchanges(): HasMany
+    {
+        return $this->hasMany(Exchange::class);
     }
 }

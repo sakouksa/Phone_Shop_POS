@@ -11,13 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('brands', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('slug');
-            $table->string('image');
-            $table->enum('status', ['active', 'inactive'])->default('active');
-
+        Schema::create('user_roles', function (Blueprint $table) {
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('role_id')->constrained()->onDelete('cascade');
+            $table->primary(['user_id', 'role_id']);
             $table->timestamps();
         });
     }
@@ -27,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('brands');
+        Schema::dropIfExists('user_roles');
     }
 };

@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Role extends Model
 {
@@ -13,23 +13,37 @@ class Role extends Model
     protected $table = 'roles';
 
     protected $fillable = [
-        'role_name',
-        'permissions'
+        'name',
+        'code',
+        'description',
+        'status',
+        'permissions',
     ];
 
     /**
      * បំប្លែង JSON permissions ទៅជា Array ដោយស្វ័យប្រវត្តិ
      */
-    protected $casts = [
-        'permissions' => 'array',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'permissions' => 'array',
+        ];
+    }
 
     /**
-     * Relationship: Role មួយ មាន User ច្រើន (One-to-Many)
+     * Relationship: Role មួយ មាន User ច្រើន (Many-to-Many)
      */
-    public function users(): HasMany
+    public function users(): BelongsToMany
     {
-        return $this->hasMany(User::class, 'role_id');
+        return $this->belongsToMany(User::class, 'user_roles');
+    }
+
+    /**
+     * Relationship: Role មួយ មាន Permission ច្រើន (Many-to-Many)
+     */
+    public function permissions(): BelongsToMany
+    {
+        return $this->belongsToMany(Permission::class, 'permission_roles');
     }
 
     /**

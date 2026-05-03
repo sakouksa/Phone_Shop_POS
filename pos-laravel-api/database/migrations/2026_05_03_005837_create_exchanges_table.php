@@ -13,6 +13,13 @@ return new class extends Migration
     {
         Schema::create('exchanges', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('customer_id')->constrained()->onDelete('cascade');
+            $table->string('old_phone_model');
+            $table->string('old_phone_imei');
+            $table->decimal('estimated_value', 10, 2);
+            $table->foreignId('new_product_id')->constrained('products')->onDelete('cascade');
+            $table->decimal('additional_fee', 10, 2);
+            $table->enum('status', ['completed', 'pending'])->default('completed');
             $table->timestamps();
         });
     }

@@ -28,42 +28,28 @@ class Product extends Model
         "status",
     ];
 
-    /**
-     * Relationship ទៅកាន់ Category (One to Many - Inverse)
-     */
     public function category(): BelongsTo
     {
-        return $this->belongsTo(Categories::class, 'category_id');
+        return $this->belongsTo(Categories::class);
     }
 
-    /**
-     * Relationship ទៅកាន់ Sub Category (One to Many - Inverse)
-     */
-    public function sub_category(): BelongsTo
+    public function subCategory(): BelongsTo
     {
-        return $this->belongsTo(SubCategories::class, 'sub_category_id');
+        return $this->belongsTo(SubCategories::class);
     }
 
-    /**
-     * Relationship ទៅកាន់ Brand (One to Many - Inverse)
-     */
     public function brand(): BelongsTo
     {
-        return $this->belongsTo(Brand::class, 'brand_id');
+        return $this->belongsTo(Brand::class);
     }
 
-    /**
-     * Relationship ទៅកាន់ IMEI Trackings (One to Many)
-     */
     public function imeiTrackings(): HasMany
     {
-        return $this->hasMany(ImeiTrackings::class, 'product_id');
+        return $this->hasMany(ImeiTrackings::class);
     }
-    /**
-     * Relationship ទៅកាន់ Purchase Order Item (One to Many)
-     */
-    public function purchaseOrderItems(): HasMany
+
+    public function saleItems(): HasMany
     {
-        return $this->hasMany(PurchaseOrderItem::class);
+        return $this->hasMany(SaleItems::class);
     }
 }

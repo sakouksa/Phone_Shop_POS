@@ -14,6 +14,11 @@ class PaymentMethod extends Model
         'status',
     ];
 
+    public function sales(): HasMany
+    {
+        return $this->hasMany(Sale::class, 'payment_method_id');
+    }
+
     public function purchaseOrders(): HasMany
     {
         return $this->hasMany(PurchaseOrder::class, 'payment_method_id');

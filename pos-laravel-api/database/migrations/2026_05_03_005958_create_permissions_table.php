@@ -13,6 +13,10 @@ return new class extends Migration
     {
         Schema::create('permissions', function (Blueprint $table) {
             $table->id();
+            $table->string('name')->unique();
+            $table->string('group');
+            $table->boolean('is_menu_web')->default(0);
+            $table->string('web_route_key')->nullable();
             $table->timestamps();
         });
     }

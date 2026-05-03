@@ -9,22 +9,15 @@ class SaleItems extends Model
 {
 
     protected $fillable = [
-        'sale_id',
-        'product_id',
-        'imei_number',
-        'quantity',
-        'unit_price',
-        'discount_item',
-        'total_line_price',
+        'sale_id', 'product_id', 'imei_number', 'quantity', 'unit_price',
+        'discount_item', 'total_line_price'
     ];
 
-    // ទំនាក់ទំនងទៅកាន់ Sale មេ
     public function sale(): BelongsTo
     {
         return $this->belongsTo(Sale::class);
     }
 
-    // ទំនាក់ទំនងទៅកាន់ Product
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);

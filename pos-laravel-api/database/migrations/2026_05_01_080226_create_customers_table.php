@@ -20,8 +20,7 @@ return new class extends Migration
 
             $table->integer('points')->default(0);
 
-            // ស្ថានភាពអតិថិជន
-            $table->boolean('status')->default(1);
+            $table->enum('status', ['active', 'inactive'])->default('active');
             $table->timestamps();
         });
     }

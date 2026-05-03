@@ -13,19 +13,11 @@ class Sale extends Model
     use HasFactory;
 
     protected $fillable = [
-        'invoice_number',
-        'customer_id',
-        'user_id',
-        'sub_total',
-        'discount',
-        'tax_amount',
-        'grand_total',
-        'amount_received',
-        'change',
-        'payment_method',
-        'status',
-        'notes',
+        'invoice_number', 'customer_id', 'user_id', 'sub_total', 'discount',
+        'tax_amount', 'grand_total', 'amount_received', 'change',
+        'payment_method_id', 'status', 'notes'
     ];
+
 
     public function customer(): BelongsTo
     {
@@ -37,13 +29,13 @@ class Sale extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function paymentMethod(): BelongsTo
+    {
+        return $this->belongsTo(PaymentMethod::class, 'payment_method_id');
+    }
+
     public function saleItems(): HasMany
     {
         return $this->hasMany(SaleItems::class);
-    }
-
-    public function imeiTrackings(): HasMany
-    {
-        return $this->hasMany(ImeiTrackings::class);
     }
 }

@@ -33,7 +33,7 @@ return new class extends Migration
             $table->boolean('has_imei')->default(false);
             $table->text('description')->nullable();
             $table->string('image')->nullable();
-            $table->string('status')->default('active'); // ឬប្រើ enum('active', 'inactive')
+            $table->enum('status', ['active', 'inactive'])->default('active');
             $table->timestamps();
         });
     }

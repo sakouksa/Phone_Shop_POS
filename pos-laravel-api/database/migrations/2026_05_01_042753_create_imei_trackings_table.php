@@ -16,8 +16,7 @@ return new class extends Migration
 
             // Foreign Key ភ្ជាប់ទៅកាន់ products
             $table->foreignId('product_id')->constrained('products')->onDelete('cascade');
-
-            $table->unsignedBigInteger('supplier_id')->nullable();
+            $table->foreignId('supplier_id')->constrained()->onDelete('cascade');
             $table->unsignedBigInteger('purchase_id')->nullable();
             $table->unsignedBigInteger('sale_id')->nullable();
 

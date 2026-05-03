@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name'); // ឧ. Cash, ABA, Wing
             $table->string('account_number')->nullable();
             $table->string('qr_code')->nullable();
-            $table->string('status')->default('active');
+            $table->enum('status', ['active', 'inactive'])->default('active');
             $table->timestamps();
         });
     }

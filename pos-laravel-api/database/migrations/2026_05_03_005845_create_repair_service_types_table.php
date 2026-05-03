@@ -13,6 +13,9 @@ return new class extends Migration
     {
         Schema::create('repair_service_types', function (Blueprint $table) {
             $table->id();
+            $table->string('name');
+            $table->text('description')->nullable();
+            $table->enum('status', ['active', 'inactive'])->default('active');
             $table->timestamps();
         });
     }

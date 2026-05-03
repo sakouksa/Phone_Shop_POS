@@ -13,6 +13,10 @@ return new class extends Migration
     {
         Schema::create('expense_lists', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('expense_type_id')->constrained()->onDelete('cascade');
+            $table->decimal('amount', 10, 2);
+            $table->text('description')->nullable();
+            $table->date('date');
             $table->timestamps();
         });
     }

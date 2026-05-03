@@ -29,21 +29,21 @@ class ImeiTrackings extends Model
 
     public function product(): BelongsTo
     {
-        return $this->belongsTo(Product::class, 'product_id');
+        return $this->belongsTo(Product::class);
     }
 
     public function supplier(): BelongsTo
     {
-        return $this->belongsTo(Supplier::class, 'supplier_id');
+        return $this->belongsTo(Supplier::class);
     }
 
     public function purchaseOrder(): BelongsTo
     {
-        return $this->belongsTo(PurchaseOrders::class, 'purchase_id');
+        return $this->belongsTo(PurchaseOrder::class, 'purchase_id');
     }
 
     public function sale(): BelongsTo
     {
-        return $this->belongsTo(Sale::class, 'sale_id');
+        return $this->belongsTo(Sale::class);
     }
 }
