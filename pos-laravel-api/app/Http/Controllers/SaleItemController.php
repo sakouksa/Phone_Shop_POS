@@ -3,14 +3,14 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Http\Requests\SaleItemRequest;
-use App\Models\SaleItems;
+use App\Models\SaleItem;
 use Illuminate\Http\Request;
 
 class SaleItemController extends Controller
 {
     public function index(Request $request)
     {
-        $query = SaleItems::query();
+        $query = SaleItem::query();
 
         if ($request->filled('sale_id')) {
             $query->where('sale_id', $request->sale_id);
@@ -33,7 +33,7 @@ class SaleItemController extends Controller
         // គណនាតម្លៃសរុប
         $data['total_line_price'] = ($request->quantity * $request->unit_price) - ($request->discount_item ?? 0);
 
-        $item = SaleItems::create($data);
+        $item = SaleItem::create($data);
 
         return response()->json([
             'data'    => $item->load('product'),
@@ -43,7 +43,7 @@ class SaleItemController extends Controller
 
     public function show($id)
     {
-        $item = SaleItems::with(['sale', 'product'])->find($id);
+        $item = SaleItem::with(['sale', 'product'])->find($id);
 
         if (!$item) {
             return response()->json(['message' => 'រកមិនឃើញទំនិញក្នុងវិក្កយបត្រ'], 404);
@@ -54,7 +54,7 @@ class SaleItemController extends Controller
 
     public function update(SaleItemRequest $request, $id)
     {
-        $item = SaleItems::find($id);
+        $item = SaleItem::find($id);
 
         if (!$item) {
             return response()->json(['message' => 'រកមិនឃើញទំនិញក្នុងវិក្កយបត្រ'], 404);
@@ -73,7 +73,7 @@ class SaleItemController extends Controller
 
     public function destroy($id)
     {
-        $item = SaleItems::find($id);
+        $item = SaleItem::find($id);
 
         if (!$item) {
             return response()->json(['message' => 'រកមិនឃើញទំនិញ'], 404);

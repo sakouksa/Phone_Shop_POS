@@ -33,33 +33,21 @@ class User extends Authenticatable implements JWTSubject
         ];
     }
 
-    /**
-     * Function JWT ដំណើរការ
-     */
     public function getJWTIdentifier()
     {
         return $this->getKey();
     }
 
-    /**
-     * Claim ផ្សេងៗបើអ្នកចង់ដាក់ក្នុង Token
-     */
     public function getJWTCustomClaims()
     {
         return [];
     }
 
-    /**
-     * Relationship ទៅកាន់ Profile (One-to-One)
-     */
     public function profile(): HasOne
     {
         return $this->hasOne(Profile::class, 'user_id');
     }
 
-    /**
-     * Relationship ទៅកាន់ Role (Many-to-Many)
-     */
     public function roles(): BelongsToMany
     {
         return $this->belongsToMany(Role::class, 'user_roles');

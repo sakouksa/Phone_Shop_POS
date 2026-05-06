@@ -2,83 +2,103 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Categories;
-use App\Http\Requests\CategoryRequest; // Import Request ថ្មី
+use App\Models\Category;
+use App\Http\Requests\CategoryRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 class CategoryController extends Controller
 {
-    // Filter data with text search and status
-    public function index(Request $req)
+    // Display a listing of the resource with filters
+    public function index(Request $request)
     {
-        $cat = Categories::withCount('subCategories');
+        $query = Category::query();
 
-        if ($req->filled("text_search")) {
-            $cat->where("name", "LIKE", "%" . $req->text_search . "%");
+        if ($request->has('id')) {
+            $query->where("id", "=", $request->input("id"));
+        }
+        if ($request->has('txt_search')) {
+            $searchTerm = $request->input('txt_search');
+            $query->where("name", "LIKE", "%" . $searchTerm . "%");
+        }
+        if ($request->has('status')) {
+            $query->where("status", "=", $request->input("status"));
         }
 
-        if ($req->has("status")) {
-            $cat->where("status", $req->status);
-        }
+        $categories = $query->orderBy('id', 'desc')->get();
 
         return response()->json([
-            'list' => $cat->orderBy('id', 'desc')->get(),
+            "list" => $categories,
+            "message" => "success",
         ]);
     }
-    // store data
+
+    // Store a newly created resource in storage
     public function store(CategoryRequest $request)
     {
-        // Validate the request data using CategoryRequest
         $data = $request->validated();
         $data['slug'] = Str::slug($request->name);
 
-        $cat = Categories::create($data);
+        $category = Category::create($data);
 
         return response()->json([
-            'data'    => $cat,
-            'message' => 'រក្សាទុកជោគជ័យ!',
-        ]);
+            "message" => "រក្សាទុកប្រភេទបានជោគជ័យ!",
+            "data"    => $category,
+        ], 201);
     }
-    // show data by id
-    public function show($id)
+
+    // Display the specified resource
+    public function show(string $id)
     {
-        $cat = Categories::with('subCategories')->find($id);
-        if ($cat) {
+        $category = Category::with('subCategories')->find($id);
+        if (!$category) {
             return response()->json([
-                'data' => $cat,
-            ]);
+                "message" => "រកមិនឃើញទិន្នន័យ",
+            ], 404);
         }
-        return response()->json(['message' => 'រកមិនឃើញទិន្នន័យ'], 404);
+
+        return response()->json([
+            "data" => $category,
+        ], 200);
     }
 
-    // update data
-    public function update(CategoryRequest $request, $id)
+    // Update the specified resource in storage
+    public function update(CategoryRequest $request, string $id)
     {
-        $cat = Categories::find($id);
-
-        if (!$cat) {
-            return response()->json(['message' => 'រកមិនឃើញទិន្នន័យ'], 404);
+        $category = Category::find($id);
+        if (!$category) {
+            return response()->json([
+                "message" => "រកមិនឃើញទិន្នន័យ",
+            ], 404);
         }
 
         $data = $request->validated();
         $data['slug'] = Str::slug($request->name);
 
-        $cat->update($data);
+        $category->update($data);
 
         return response()->json([
-            'data'    => $cat,
-            'message' => 'កែប្រែបានជោគជ័យ!',
-        ]);
+            "data"    => $category,
+            "message" => "កែប្រែបានជោគជ័យ!",
+        ], 200);
     }
-    // delete data
-    public function destroy($id)
+
+    // Remove the specified resource from storage
+    public function destroy(string $id)
     {
-        $category = Categories::find($id);
-        if ($category) {
-            $category->delete();
-            return response()->json(['success' => true, 'message' => 'លុបជោគជ័យ']);
+        $category = Category::find($id);
+
+        if (!$category) {
+            return response()->json([
+                "message" => "រកមិនឃើញទិន្នន័យ",
+            ], 404);
         }
-        return response()->json(['message' => 'រកមិនឃើញទិន្នន័យ'], 404);
+
+        $category->delete();
+
+        return response()->json([
+            "message" => "លុបបានជោគជ័យ!",
+            "data"    => $category,
+        ], 200);
     }
 }

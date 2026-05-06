@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderItem;
 use App\Models\Product;
 use App\Http\Requests\PurchaseOrderItemRequest;
@@ -17,13 +18,14 @@ class PurchaseOrderItemController extends Controller
             $query->where('purchase_order_id', $request->purchase_order_id);
         }
 
-        $items = $query->with(['purchaseOrder', 'product'])
+        $items = $query->with(['purchase_order', 'product'])
             ->orderBy('id', 'desc')
             ->get();
 
         return response()->json([
             'list' => $items,
             'products' => Product::all(),
+            'purchase_order' => PurchaseOrder::all(),
         ]);
     }
 

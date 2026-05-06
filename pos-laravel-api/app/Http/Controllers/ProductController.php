@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Brand;
-use App\Models\Categories;
+use App\Models\Category;
 use App\Models\Product;
 use App\Http\Requests\ProductRequest; // ហៅ Request មកប្រើ
-use App\Models\Sub_Categories;
+use App\Models\SubCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -30,13 +30,22 @@ class ProductController extends Controller
         if ($request->filled('brand_id')) {
             $query->where('brand_id', $request->brand_id);
         }
-        $product = $query->with(['category', 'brand', 'sub_category'])->orderBy('id', 'desc')->get();
+        if ($request->filled('subcategory_id')) {
+            $query->where('subcategory_id', $request->subcategory_id);
+        }
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            $query->whereBetween('created_at', [
+                $request->start_date . ' 00:00:00',
+                $request->end_date . ' 23:59:59'
+            ]);
+        }
+        $product = $query->with(['category', 'brand', 'subCategory'])->orderBy('id', 'desc')->get();
 
         return response()->json([
             'list' => $product,
-            "category" => Categories::all(),
+            "category" => Category::all(),
             "brand" => Brand::all(),
-            "sub_category" => Sub_Categories::all(),
+            "sub_category" => SubCategory::all(),
         ]);
     }
 

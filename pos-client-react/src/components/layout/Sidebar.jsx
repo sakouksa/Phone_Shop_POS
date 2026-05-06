@@ -7,7 +7,6 @@ import {
   UserOutlined,
   SafetyCertificateOutlined,
   SettingOutlined,
-  ThunderboltFilled,
 } from "@ant-design/icons";
 
 import {
@@ -27,7 +26,6 @@ import { CiCloudOn } from "react-icons/ci";
 // Import custom CSS for Sidebar
 import "../../assets/css/Sidebar.css";
 
-
 const { Sider } = Layout;
 
 function getItem(label, key, icon, children) {
@@ -40,6 +38,7 @@ export const sidebarItems = [
     getItem("ផ្ទាំងលក់ POS", "/pos", <MdPointOfSale />),
     getItem("ប្តូរគ្រឿង/វាយដូរ", "/exchange", <BsPhoneFlip />),
     getItem("បញ្ជីលក់/វិក្កយបត្រ", "/orders", <AiOutlineShoppingCart />),
+    getItem("លក់" , "sale" ,<MdPointOfSale />,)
   ]),
   getItem("សេវាកម្មជួសជុល", "repair", <ToolOutlined />, [
     getItem("បញ្ជីទទួលជួសជុល", "/repair", <MdOutlinePhonelinkSetup />),
@@ -108,6 +107,9 @@ const Sidebar = ({
   location,
   navigate,
 }) => {
+  //set menu active based on location
+  const selectedKeys = ["/"];
+
   return (
     <Sider
       trigger={null}
@@ -126,14 +128,12 @@ const Sidebar = ({
       {/* Logo Section */}
       <div className="h-[70px] flex items-center px-5 justify-between border-b border-dashed border-[#e2e8f0]/20">
         <div className="flex items-center">
-          {/* Icon និង Background សម្រាប់ហាងទូរស័ព្ទ */}
           <div className="w-[38px] h-[38px] rounded-xl bg-gradient-to-tr from-[#EC5325] to-[#f87c55] flex items-center justify-center text-white shadow-lg shadow-[#ec52253b]">
             <BsPhoneFlip className="text-lg" />
           </div>
 
           {!collapsed && (
             <div className="ml-3 flex flex-col justify-center animate-in fade-in slide-in-from-left-2 duration-300">
-              {/* ឈ្មោះហាង (អ្នកអាចកែឈ្មោះតាមចិត្តចង់បាន) */}
               <span
                 className={`font-bold text-base tracking-tight font-['Kantumruy_Pro'] leading-tight ${
                   isDarkMode ? "text-white" : "text-[#141824]"
@@ -154,7 +154,7 @@ const Sidebar = ({
         mode="inline"
         openKeys={openKeys}
         onOpenChange={onOpenChange}
-        selectedKeys={[location.pathname]}
+        selectedKeys={selectedKeys}
         items={sidebarItems}
         onClick={(item) => navigate(item.key)}
         className={`border-r-0 h-[calc(100vh-70px)] overflow-y-auto bg-transparent px-3 py-4 space-y-1 custom-scrollbar ${

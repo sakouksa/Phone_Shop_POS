@@ -24,8 +24,8 @@ class SubCategoryRequest extends FormRequest
         $id = $this->route('sub_category') ?? $this->route('id');
         return [
             'category_id' => 'required|exists:categories,id',
-            'name'        => 'required|string|max:255',
-            'status'      => 'required|boolean',
+            'name'        => 'required|string|max:255|unique:sub_categories,name,' . $id,
+            'status' => 'required|in:active,inactive,0,1',
             'image'       => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'slug'        => 'nullable|string',
         ];

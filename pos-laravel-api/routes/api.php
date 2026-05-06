@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ImeiTrackingController;
 use App\Http\Controllers\PaymentMethodController;
 use App\Http\Controllers\ProductController;
@@ -34,4 +35,5 @@ Route::middleware('auth:api')->group(function () {
     Route::apiResource('purchase-orders', PurchaseOrderController::class);
     Route::apiResource('purchase-order-items', PurchaseOrderItemController::class);
     Route::apiResource('payment-methods', PaymentMethodController::class);
+    Route::apiResource('customers', CustomerController::class);
 });

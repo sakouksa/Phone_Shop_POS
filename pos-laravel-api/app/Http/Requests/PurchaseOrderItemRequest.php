@@ -11,7 +11,7 @@ class PurchaseOrderItemRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -26,6 +26,10 @@ class PurchaseOrderItemRequest extends FormRequest
             'product_id'        => 'required|exists:products,id',
             'quantity'          => 'required|integer|min:1',
             'unit_price'        => 'required|numeric|min:0',
+            'cost_price'        => 'required|numeric|min:0',
+            'sub_total'         => 'required|numeric|min:0',
+            'remarks'           => 'nullable|string',
+
         ];
     }
 }

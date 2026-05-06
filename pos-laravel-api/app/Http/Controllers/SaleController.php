@@ -3,7 +3,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Sale;
 use App\Models\Customer;
-use App\Models\SaleItems;
+use App\Models\SaleItem;
 use App\Models\User;
 use App\Http\Requests\SaleRequest;
 use Illuminate\Http\Request;
@@ -53,7 +53,7 @@ class SaleController extends Controller
 
             // រក្សាទុក items ចូលក្នុងតារាង sale_items
             foreach ($request->items as $item) {
-                SaleItems::create([
+                SaleItem::create([
                     'sale_id'          => $sale->id,
                     'product_id'       => $item['product_id'],
                     'imei_number'      => $item['imei_number'] ?? null,

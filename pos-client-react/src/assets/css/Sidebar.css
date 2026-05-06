@@ -1,4 +1,4 @@
-
+/* សម្រាប់ Dark Mode */
 .dark-menu .ant-menu-item-selected {
     background: linear-gradient(135deg, #ec5325 0%, #a13010 100%) !important;
     color: #ffffff !important;
@@ -10,6 +10,14 @@
     color: #ffffff !important;
 }
 
+/* ពេល Submenu ត្រូវបានបើក ឬ Active */
+.dark-menu .ant-menu-submenu-selected>.ant-menu-submenu-title,
+.dark-menu .ant-menu-item-selected {
+    background: linear-gradient(135deg, #ec5325 0%, #a13010 100%) !important;
+    color: #ffffff !important;
+}
+
+/* សម្រាប់ Light Mode */
 .light-menu .ant-menu-item-selected {
     background: #fdf2e9 !important;
     color: #ec5325 !important;
@@ -19,6 +27,19 @@
 .light-menu .ant-menu-item-selected svg,
 .light-menu .ant-menu-item-selected .anticon {
     color: #ec5325 !important;
+}
+
+/* ពេល Submenu ត្រូវបានបើក ឬ Active សម្រាប់ Light Mode */
+.light-menu .ant-menu-submenu-selected>.ant-menu-submenu-title,
+.light-menu .ant-menu-item-selected {
+    background: #fdf2e9 !important;
+    color: #ec5325 !important;
+    border-radius: 8px;
+}
+
+/* រក្សាពណ៌ផ្ទាំងគ្រប់គ្រងឱ្យជាប់ជានិច្ច ពេល Active */
+.ant-menu-item-selected[title="ផ្ទាំងគ្រប់គ្រង"] {
+    font-weight: bold;
 }
 
 .ant-menu-item,

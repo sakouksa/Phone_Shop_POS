@@ -25,7 +25,6 @@ const LoginPage = () => {
       message.success(res.message || "ចូលប្រើបានជោគជ័យ!");
       navigate("/");
     } else {
-      // បង្ហាញសារកំហុសពី Backend ឬសារលំនាំដើមជាភាសាខ្មែរ
       const errorMsg =
         res?.errors?.message || "អ៊ីមែល ឬលេខសម្ងាត់មិនត្រឹមត្រូវទេ!";
       message.error(errorMsg);
@@ -33,57 +32,93 @@ const LoginPage = () => {
   };
 
   return (
-    <div
-      style={{
-        width: 400,
-        padding: 25,
-        margin: "100px auto",
-        border: "1px solid #d9d9d9",
-        backgroundColor: "#fff",
-        borderRadius: 10,
-        boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-      }}
-    >
-      <h1 style={{ textAlign: "center", marginBottom: 20 }}>
-        ចូលប្រើប្រាស់គណនី
-      </h1>
-      <Form name="login" onFinish={onFinish} layout="vertical">
-        <Form.Item
-          name="username"
-          rules={[{ required: true, message: "សូមបញ្ចូលអ៊ីមែលរបស់អ្នក!" }]}
-        >
-          <Input prefix={<UserOutlined />} placeholder="អ៊ីមែល" size="large" />
-        </Form.Item>
+    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+      <div className="sm:mx-auto sm:w-full sm:max-w-md">
+        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+          ចូលប្រើប្រាស់គណនី
+        </h2>
+        <p className="mt-2 text-center text-sm text-gray-600">
+          សូមបំពេញព័ត៌មានខាងក្រោមដើម្បីបន្ត
+        </p>
+      </div>
 
-        <Form.Item
-          name="password"
-          rules={[{ required: true, message: "សូមបញ្ចូលលេខសម្ងាត់របស់អ្នក!" }]}
-        >
-          <Input.Password
-            prefix={<LockOutlined />}
-            placeholder="លេខសម្ងាត់"
-            size="large"
-          />
-        </Form.Item>
-
-        <Form.Item>
-          <Flex justify="space-between" align="center">
-            <Form.Item name="remember" valuePropName="checked" noStyle>
-              <Checkbox>ចងចាំខ្ញុំ</Checkbox>
+      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="bg-white py-8 px-6 shadow sm:rounded-lg sm:px-10 border border-gray-200">
+          <Form
+            name="login"
+            onFinish={onFinish}
+            layout="vertical"
+            requiredMark="optional"
+          >
+            <Form.Item
+              name="username"
+              label={<span className="font-medium text-gray-700">អ៊ីមែល</span>}
+              rules={[{ required: true, message: "សូមបញ្ចូលអ៊ីមែលរបស់អ្នក!" }]}
+            >
+              <Input
+                prefix={<UserOutlined className="text-gray-400" />}
+                placeholder="អ៊ីមែល"
+                size="large"
+                className="rounded-md"
+              />
             </Form.Item>
-            <a href="/forgot-password">ភ្លេចលេខសម្ងាត់?</a>
-          </Flex>
-        </Form.Item>
 
-        <Form.Item>
-          <Button block type="primary" htmlType="submit" size="large">
-            ចូលប្រើប្រាស់
-          </Button>
-          <div style={{ marginTop: 10, textAlign: "center" }}>
-            ឬ <a href="/register">ចុះឈ្មោះឥឡូវនេះ!</a>
-          </div>
-        </Form.Item>
-      </Form>
+            <Form.Item
+              name="password"
+              label={
+                <span className="font-medium text-gray-700">លេខសម្ងាត់</span>
+              }
+              rules={[
+                { required: true, message: "សូមបញ្ចូលលេខសម្ងាត់របស់អ្នក!" },
+              ]}
+            >
+              <Input.Password
+                prefix={<LockOutlined className="text-gray-400" />}
+                placeholder="លេខសម្ងាត់"
+                size="large"
+                className="rounded-md"
+              />
+            </Form.Item>
+
+            <Form.Item>
+              <Flex justify="space-between" align="center">
+                <Form.Item name="remember" valuePropName="checked" noStyle>
+                  <Checkbox className="text-sm text-gray-600">
+                    ចងចាំខ្ញុំ
+                  </Checkbox>
+                </Form.Item>
+                <a
+                  href="/forgot-password"
+                  className="text-sm font-medium text-indigo-600 hover:text-indigo-500 transition-colors duration-150"
+                >
+                  ភ្លេចលេខសម្ងាត់?
+                </a>
+              </Flex>
+            </Form.Item>
+
+            <Form.Item className="mb-0">
+              <Button
+                type="primary"
+                htmlType="submit"
+                size="large"
+                block
+                className="bg-indigo-600 hover:bg-indigo-700 border-none font-semibold text-base shadow-sm h-11"
+              >
+                ចូលប្រើប្រាស់
+              </Button>
+              <div className="mt-6 text-center text-sm text-gray-600">
+                ឬ{" "}
+                <a
+                  href="/register"
+                  className="font-medium text-indigo-600 hover:text-indigo-500 transition-colors duration-150"
+                >
+                  ចុះឈ្មោះឥឡូវនេះ!
+                </a>
+              </div>
+            </Form.Item>
+          </Form>
+        </div>
+      </div>
     </div>
   );
 };

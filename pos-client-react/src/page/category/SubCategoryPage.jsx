@@ -11,32 +11,44 @@ import {
   Table,
   Tag,
   Upload,
+  Typography,
+  Pagination,
 } from "antd";
+
 import { CiEdit } from "react-icons/ci";
 import { request } from "../../util/request";
 import { RiSave3Fill } from "react-icons/ri";
-import { FilterOutlined, ReloadOutlined } from "@ant-design/icons";
+import {
+  FilterOutlined,
+  ReloadOutlined,
+  SearchOutlined,
+  ExclamationCircleFilled,
+  PlusOutlined,
+} from "@ant-design/icons";
 import { IoMdAddCircle } from "react-icons/io";
 import { MdDelete } from "react-icons/md";
-import { ExclamationCircleFilled } from "@ant-design/icons";
 import { BiSolidEditAlt } from "react-icons/bi";
 import MainPage from "../../components/layout/MainPage";
 import config from "../../util/config";
 import UploadButton from "../../components/button/UploadButton";
 import { usePreviewStore } from "../../store/previewStore";
+import { usePaginationStore } from "../../store/usePaginationStore"; // Import zustand store
+
+const { Text } = Typography;
 
 function SubCategoryPage() {
   const [formRef] = Form.useForm();
   const [state, setState] = useState({
     list: [],
     category: [],
-    total: 0,
     loading: false,
     open: false,
   });
 
+  const { pagination, setPagination, resetPagination } = usePaginationStore();
+
   const [filter, setFilter] = useState({
-    text_search: "",
+    txt_search: "",
     status: null,
     category_id: null,
   });
@@ -72,28 +84,29 @@ function SubCategoryPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const getList = async () => {
+  const getList = async (currentFilter = pagination) => {
     setState((pre) => ({ ...pre, loading: true }));
-    let query_param = "?page=1";
-    if (filter.text_search) {
-      query_param += "&text_search=" + filter.text_search;
+
+    let query_param = `?page=${currentFilter.page}&limit=${currentFilter.limit}`;
+    if (currentFilter.txt_search) {
+      query_param += "&txt_search=" + currentFilter.txt_search;
     }
-    if (filter.status !== "" && filter.status !== null) {
-      query_param += "&status=" + filter.status;
+    if (currentFilter.status !== "" && currentFilter.status !== null) {
+      query_param += "&status=" + currentFilter.status;
     }
-    if (filter.category_id) {
-      query_param += "&category_id=" + filter.category_id;
+    if (currentFilter.category_id) {
+      query_param += "&category_id=" + currentFilter.category_id;
     }
 
     const res = await request("sub_categories" + query_param, "get", {});
     if (res && !res.errors) {
       setState((pre) => ({
         ...pre,
-        total: res.total || res.list?.length,
         list: res.list || [],
         category: res.category || [],
         loading: false,
       }));
+      setPagination({ total: res.total || res.list?.length || 0 });
     } else {
       setState((pre) => ({ ...pre, loading: false }));
       if (res.errors?.message) {
@@ -136,7 +149,7 @@ function SubCategoryPage() {
 
     const currentSlug = formRef.getFieldValue("slug") || "";
     formData.append("slug", currentSlug);
-    formData.append("status", item.status ?? 1);
+    formData.append("status", item.status ?? "active");
 
     if (fileList.length > 0 && fileList[0].originFileObj) {
       formData.append("image", fileList[0].originFileObj);
@@ -206,87 +219,136 @@ function SubCategoryPage() {
   };
 
   const handleFilter = () => {
-    getList();
+    setPagination({ page: 1 });
+    getList({
+      ...pagination,
+      page: 1,
+      txt_search: filter.txt_search,
+      status: filter.status,
+      category_id: filter.category_id,
+    });
   };
 
-  const handleReset = () => {
-    setFilter({
-      text_search: "",
-      status: "",
-      category_id: "",
+  const handleReset = async () => {
+    resetPagination();
+    const resetFilter = {
+      txt_search: "",
+      status: null,
+      category_id: null,
+    };
+    setFilter(resetFilter);
+    getList({
+      page: 1,
+      limit: 10,
+      txt_search: "",
+      status: null,
+      category_id: null,
     });
-    getList();
+  };
+
+  const handlePageChange = (page, pageSize) => {
+    setPagination({ page, limit: pageSize });
+    getList({ ...pagination, page, limit: pageSize });
   };
 
   return (
     <MainPage loading={state.loading}>
       <div>
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 w-full">
-          <Space wrap size={[8, 16]} className="flex-1 w-full md:w-auto">
-            <div className="text-lg font-medium text-gray-700">
-              សរុបប្រភេទរង៖ {state.list.length}
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-6">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+            <div>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white m-0 flex flex-col md:flex-row md:items-center gap-2">
+                បញ្ជីគ្រប់គ្រងប្រភេទរង
+                <span className="text-sm font-normal text-indigo-600 dark:text-indigo-400 dark:bg-indigo-900/30 px-3 py-1 rounded-full w-fit">
+                  ប្រភេទរងសរុប: {pagination.total || 0}
+                </span>
+              </h2>
+              <Text type="secondary" className="text-sm dark:text-gray-400">
+                គ្រប់គ្រងប្រភេទរង និងទិន្នន័យពាក់ព័ន្ធរបស់អ្នកនៅទីនេះ
+              </Text>
             </div>
 
-            <Input.Search
-              allowClear
-              value={filter.text_search}
-              onChange={(e) =>
-                setFilter((p) => ({ ...p, text_search: e.target.value }))
-              }
-              placeholder="ស្វែងរកតាមឈ្មោះ..."
-              onSearch={handleFilter}
-              style={{ width: 200 }}
-            />
+            <div className="flex flex-wrap items-center gap-3 w-full md:w-auto justify-end">
+              <Button
+                type="primary"
+                onClick={handleOpenModal}
+                icon={<PlusOutlined />}
+                className="h-9 px-5 bg-indigo-600 hover:bg-indigo-700 border-0 rounded-lg font-medium shadow-sm flex items-center transition-all"
+              >
+                ប្រភេទរងថ្មី
+              </Button>
+            </div>
+          </div>
 
-            <Select
-              allowClear
-              placeholder="ស្ថានភាព"
-              style={{ width: 130 }}
-              value={filter.status}
-              onChange={(value) => setFilter((p) => ({ ...p, status: value }))}
-              options={[
-                { label: "សកម្ម", value: 1 },
-                { label: "អសកម្ម", value: 0 },
-              ]}
-            />
+          <div className="border-t border-gray-100 pt-6">
+            <div className="flex flex-wrap justify-between items-center gap-4">
+              <Input
+                allowClear
+                value={filter.txt_search}
+                onChange={(e) =>
+                  setFilter((p) => ({ ...p, txt_search: e.target.value }))
+                }
+                placeholder="ស្វែងរកតាមឈ្មោះ..."
+                onPressEnter={handleFilter}
+                prefix={
+                  <SearchOutlined className="text-gray-400 dark:text-gray-500 mr-2" />
+                }
+                style={{ width: 220 }}
+              />
 
-            <Select
-              allowClear
-              placeholder="ជ្រើសរើសប្រភេទ"
-              style={{ width: 160 }}
-              value={filter.category_id}
-              onChange={(value) =>
-                setFilter((p) => ({ ...p, category_id: value }))
-              }
-              options={state.category?.map((item) => ({
-                label: item.name,
-                value: item.id,
-              }))}
-            />
+              <div className="flex flex-wrap items-center gap-3">
+                <Select
+                  allowClear
+                  placeholder="ស្ថានភាព"
+                  style={{ width: 150 }}
+                  value={filter.status}
+                  onChange={(value) =>
+                    setFilter((p) => ({ ...p, status: value }))
+                  }
+                  options={[
+                    { label: "សកម្ម", value: "active" },
+                    { label: "អសកម្ម", value: "inactive" },
+                  ]}
+                />
 
-            <Button onClick={handleReset} icon={<ReloadOutlined />}>
-              សារឡើងវិញ
-            </Button>
+                <Select
+                  allowClear
+                  placeholder="ជ្រើសរើសប្រភេទ"
+                  style={{ width: 180 }}
+                  value={filter.category_id}
+                  onChange={(value) =>
+                    setFilter((p) => ({ ...p, category_id: value }))
+                  }
+                  options={state.category?.map((item) => ({
+                    label: item.name,
+                    value: item.id,
+                  }))}
+                />
 
-            <Button
-              type="primary"
-              onClick={handleFilter}
-              icon={<FilterOutlined />}
-            >
-              ស្វែងរក
-            </Button>
-          </Space>
-
-          <Button
-            type="primary"
-            onClick={handleOpenModal}
-            icon={<IoMdAddCircle style={{ fontSize: "18px" }} />}
-            style={{ borderRadius: "8px" }}
-          >
-            ប្រភេទរងថ្មី
-          </Button>
+                <div className="flex gap-2">
+                  <Button
+                    type="default"
+                    onClick={handleReset}
+                    icon={<ReloadOutlined />}
+                    className="px-3 flex items-center hover:text-indigo-600"
+                  >
+                    កំណត់ឡើងវិញ
+                  </Button>
+                  <Button
+                    type="primary"
+                    onClick={handleFilter}
+                    icon={<FilterOutlined />}
+                    className="px-3 flex items-center bg-indigo-600 border-0 hover:bg-indigo-700"
+                  >
+                    តម្រងទិន្នន័យ
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
+        {/* Modal Section */}
         <Modal
           title={
             formRef.getFieldValue("id")
@@ -330,7 +392,7 @@ function SubCategoryPage() {
               >
                 <Input
                   placeholder="បញ្ចូលឈ្មោះប្រភេទរង"
-                  onChange={(e) => handleNameChange(e)}
+                  onChange={handleNameChange}
                 />
               </Form.Item>
 
@@ -342,12 +404,12 @@ function SubCategoryPage() {
                 />
               </Form.Item>
 
-              <Form.Item label="ស្ថានភាព" name="status" initialValue={1}>
+              <Form.Item label="ស្ថានភាព" name="status" initialValue="active">
                 <Select
                   placeholder="ជ្រើសរើសស្ថានភាព"
                   options={[
-                    { label: "សកម្ម", value: 1 },
-                    { label: "អសកម្ម", value: 0 },
+                    { label: "សកម្ម", value: "active" },
+                    { label: "អសកម្ម", value: "inactive" },
                   ]}
                 />
               </Form.Item>
@@ -397,10 +459,12 @@ function SubCategoryPage() {
           </Form>
         </Modal>
 
+        {/* Table Section */}
         <Table
           dataSource={state.list}
           rowKey="id"
           scroll={{ x: 800 }}
+          pagination={false}
           columns={[
             { title: "ឈ្មោះ", dataIndex: "name", key: "name" },
             { title: "Slug", dataIndex: "slug", key: "slug" },
@@ -431,7 +495,7 @@ function SubCategoryPage() {
               key: "status",
               align: "center",
               render: (value) => {
-                const isActive = value === 1;
+                const isActive = value === "active";
                 return (
                   <Tag
                     bordered={false}
@@ -464,6 +528,22 @@ function SubCategoryPage() {
             },
           ]}
         />
+        <div className="flex justify-between items-center bg-white p-4 border border-gray-100 rounded-b-2xl shadow-sm mt-0.5">
+          <span className="text-gray-600 text-sm">
+            សរុប: <b className="text-indigo-600">{pagination.total || 0}</b>{" "}
+            ទិន្នន័យ
+          </span>
+          <Pagination
+            current={pagination.page}
+            pageSize={pagination.limit}
+            total={pagination.total}
+            onChange={handlePageChange}
+            showSizeChanger
+            pageSizeOptions={["10", "20", "50", "100"]}
+            showTotal={(total, range) => `${range[0]}-${range[1]} នៃ ${total}`}
+            className="ant-pagination-custom"
+          />
+        </div>
       </div>
     </MainPage>
   );

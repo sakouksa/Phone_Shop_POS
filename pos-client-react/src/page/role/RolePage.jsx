@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react'
 
 const RolePage = () => {
   return (
@@ -6,7 +6,7 @@ const RolePage = () => {
       <h1>Role Page</h1>
       <p>នេះគឺជាទំព័រតួនាទី (Test)</p>
     </div>
-  );
-};
+  )
+}
 
-export default RolePage;
+export default RolePage

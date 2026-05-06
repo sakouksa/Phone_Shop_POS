@@ -11,29 +11,40 @@ import {
   Table,
   Tag,
   Upload,
+  Typography,
+  Pagination,
 } from "antd";
+
 import { CiEdit } from "react-icons/ci";
 import { request } from "../../util/request";
 import { RiSave3Fill } from "react-icons/ri";
-import { FilterOutlined, SearchOutlined } from "@ant-design/icons";
-import { IoMdAddCircle } from "react-icons/io";
-import { dateClient } from "../../util/helper";
+import {
+  FilterOutlined,
+  ReloadOutlined,
+  SearchOutlined,
+  ExclamationCircleFilled,
+  PlusOutlined,
+} from "@ant-design/icons";
 import { MdDelete } from "react-icons/md";
-import { ExclamationCircleFilled } from "@ant-design/icons";
 import { BiSolidEditAlt } from "react-icons/bi";
 import MainPage from "../../components/layout/MainPage";
 import config from "../../util/config";
 import UploadButton from "../../components/button/UploadButton";
 import { usePreviewStore } from "../../store/previewStore";
+import { usePaginationStore } from "../../store/usePaginationStore";
+import { dateClient } from "../../util/helper";
+
+const { Text } = Typography;
 
 function BrandPage() {
   const [formRef] = Form.useForm();
   const [state, setState] = useState({
     list: [],
-    total: 0,
     loading: false,
     open: false,
   });
+  //calling zustand usePaginationStore
+  const { pagination, setPagination, resetPagination } = usePaginationStore();
 
   const [filter, setFilter] = useState({
     text_search: "",
@@ -41,10 +52,12 @@ function BrandPage() {
     country: "",
   });
 
+  const [countries, setCountries] = useState([]);
+  const [loadingCountry, setLoadingCountry] = useState(false);
   const [validate, setValidate] = useState({});
   const [fileList, setFileList] = useState([]);
 
-  // ហៅ Zustand Store
+  //Calling Zustand Store
   const {
     open,
     imgUrl,
@@ -53,7 +66,7 @@ function BrandPage() {
     handleClosePreview,
   } = usePreviewStore();
 
-  // មុខងារ handlePreview
+  // handlePreview image
   const handlePreview = async (file) => {
     if (!file.url && !file.preview) {
       file.preview = await getBase64(file.originFileObj);
@@ -68,47 +81,32 @@ function BrandPage() {
       reader.onload = () => resolve(reader.result);
       reader.onerror = (error) => reject(error);
     });
-// country list api
-const fetchCountries = async () => {
-  try {
-    const response = await fetch("https://restcountries.com/v3.1/all");
-    const data = await response.json();
 
-    data.sort((a, b) => a.name.common.localeCompare(b.name.common));
 
-    // កំណត់ទម្រង់ទិន្នន័យ (label និង value) ឲ្យត្រូវនឹង Ant Design Select
-    const countryOptions = data.map((country) => ({
-      label: country.name.common,
-      value: country.name.common,
-    }));
-    setCountries(countryOptions);
-  } catch (error) {
-    console.error("Error fetching countries:", error);
-  }
-};
   useEffect(() => {
     getList();
-    fetchCountries();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const getList = async () => {
+  const getList = async (currentFilter = pagination) => {
     setState((pre) => ({ ...pre, loading: true }));
-    let query_param = "?page=1";
+    let query_param = `?page=${currentFilter.page}&limit=${currentFilter.limit}`;
+
     if (filter.text_search) {
       query_param += "&txt_search=" + filter.text_search;
     }
     if (filter.status) {
       query_param += "&status=" + filter.status;
     }
+
     const res = await request("brands" + query_param, "get", {});
     if (res && !res.errors) {
       setState((pre) => ({
         ...pre,
-        total: res.total || res.list?.length,
         list: res.list || [],
         loading: false,
       }));
+      setPagination({ total: res.total || res.list?.length || 0 });
     } else {
       setState((pre) => ({ ...pre, loading: false }));
       if (res.errors?.message) {
@@ -150,7 +148,7 @@ const fetchCountries = async () => {
     formData.append("slug", currentSlug);
     formData.append("status", item.status || "active");
     formData.append("country", item.country || "");
-    // ករណីមានការ Upload រូបភាពថ្មី
+
     if (fileList.length > 0 && fileList[0].originFileObj) {
       formData.append("image", fileList[0].originFileObj);
     } else if (fileList.length === 0 && formRef.getFieldValue("id")) {
@@ -218,62 +216,117 @@ const fetchCountries = async () => {
   };
 
   const handleFilter = () => {
-    getList();
+    setPagination({ page: 1 });
+    getList({
+      ...pagination,
+      page: 1,
+      txt_search: filter.text_search,
+      status: filter.status,
+    });
+  };
+
+  const handleReset = () => {
+    resetPagination();
+    const resetFilter = {
+      text_search: "",
+      status: "",
+      country: "",
+    };
+    setFilter(resetFilter);
+    getList({ page: 1, limit: 10, txt_search: "", status: "", country: "" });
+  };
+
+  const handlePageChange = (page, pageSize) => {
+    setPagination({ page, limit: pageSize });
+    getList({ ...pagination, page, limit: pageSize });
   };
 
   return (
     <MainPage loading={state.loading}>
       <div>
-        <div
-          className="main-page-header"
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            marginBottom: 16,
-          }}
-        >
-          <Space>
-            <div>ម៉ាកផលិតផលសរុប: {state.list.length}</div>
-            <Input.Search
-              allowClear
-              value={filter.text_search}
-              onChange={(e) =>
-                setFilter((p) => ({ ...p, text_search: e.target.value }))
-              }
-              placeholder="ស្វែងរកម៉ាកផលិតផល..."
-              onSearch={handleFilter}
-            />
-            {/* filter by status */}
-            <Select
-              allowClear
-              placeholder="ស្ថានភាព"
-              style={{ width: 150 }}
-              value={filter.status}
-              onChange={(value) => setFilter((p) => ({ ...p, status: value }))}
-              options={[
-                { label: "ទាំងអស់", value: "" },
-                { label: "សកម្ម", value: "active" },
-                { label: "អសកម្ម", value: "inactive" },
-              ]}
-            />
-            <Button
-              type="primary"
-              onClick={handleFilter}
-              icon={<FilterOutlined />}
-            >
-              ស្វែងរក
-            </Button>
-          </Space>
-          <Button
-            type="primary"
-            onClick={handleOpenModal}
-            icon={<IoMdAddCircle style={{ fontSize: "18px" }} />}
-            style={{ borderRadius: "8px" }}
-          >
-            ម៉ាកថ្មី
-          </Button>
+        {/* Card Header & Filter Section */}
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-6">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+            <div>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white m-0 flex flex-col md:flex-row md:items-center gap-2">
+                បញ្ជីគ្រប់គ្រងម៉ាកផលិតផល
+                <span className="text-sm font-normal text-indigo-600 dark:text-indigo-400 dark:bg-indigo-900/30 px-3 py-1 rounded-full w-fit">
+                  ម៉ាកផលិតផលសរុប: {pagination.total || 0}
+                </span>
+              </h2>
+              <Text type="secondary" className="text-sm dark:text-gray-400">
+                គ្រប់គ្រងម៉ាក និងទិន្នន័យពាក់ព័ន្ធរបស់អ្នកនៅទីនេះ
+              </Text>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3 w-full md:w-auto justify-end">
+              <Button
+                type="primary"
+                onClick={handleOpenModal}
+                icon={<PlusOutlined />}
+                className="h-9 px-5 bg-indigo-600 hover:bg-indigo-700 border-0 rounded-lg font-medium shadow-sm flex items-center transition-all"
+              >
+                ម៉ាកថ្មី
+              </Button>
+            </div>
+          </div>
+
+          <div className="border-t border-gray-100 pt-6">
+            <div className="flex flex-wrap justify-between items-center gap-4">
+              <Input
+                allowClear
+                value={filter.text_search}
+                onChange={(e) =>
+                  setFilter((p) => ({ ...p, text_search: e.target.value }))
+                }
+                placeholder="ស្វែងរកម៉ាកផលិតផល..."
+                onPressEnter={handleFilter}
+                prefix={
+                  <SearchOutlined className="text-gray-400 dark:text-gray-500 mr-2" />
+                }
+                style={{ width: 220 }}
+              />
+
+              <div className="flex flex-wrap items-center gap-3">
+                <Select
+                  allowClear
+                  placeholder="ស្ថានភាព"
+                  style={{ width: 150 }}
+                  value={filter.status}
+                  onChange={(value) =>
+                    setFilter((p) => ({ ...p, status: value }))
+                  }
+                  options={[
+                    { label: "ទាំងអស់", value: "" },
+                    { label: "សកម្ម", value: "active" },
+                    { label: "អសកម្ម", value: "inactive" },
+                  ]}
+                />
+
+                <div className="flex gap-2">
+                  <Button
+                    type="default"
+                    onClick={handleReset}
+                    icon={<ReloadOutlined />}
+                    className="px-3 flex items-center hover:text-indigo-600"
+                  >
+                    កំណត់ឡើងវិញ
+                  </Button>
+                  <Button
+                    type="primary"
+                    onClick={handleFilter}
+                    icon={<FilterOutlined />}
+                    className="px-3 flex items-center bg-indigo-600 border-0 hover:bg-indigo-700"
+                  >
+                    តម្រងទិន្នន័យ
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
+        {/* Modal Section */}
         <Modal
           title={
             formRef.getFieldValue("id")
@@ -288,7 +341,7 @@ const fetchCountries = async () => {
           maskClosable={false}
         >
           <Form layout="vertical" onFinish={onFinish} form={formRef}>
-            <div style={{ display: "grid" }}>
+            <div className="flex flex-col gap-1">
               <Form.Item
                 label="ឈ្មោះម៉ាក"
                 name="name"
@@ -304,13 +357,15 @@ const fetchCountries = async () => {
               <Form.Item label="Slug" name="slug">
                 <Input placeholder="Slug" />
               </Form.Item>
+
               <Form.Item
                 label="ប្រទេស (Country)"
                 name="country"
                 {...validate.country}
               >
-                <Input placeholder="បញ្ចូលឈ្មោះប្រទេស (ឧ. USA, China)" />
+                <Input placeholder="បញ្ចូលឈ្មោះប្រទេស (ឧ. USA, Cambodia)" />
               </Form.Item>
+
               <Form.Item label="ស្ថានភាព" name="status" initialValue="active">
                 <Select
                   placeholder="ជ្រើសរើសស្ថានភាព"
@@ -366,10 +421,12 @@ const fetchCountries = async () => {
           </Form>
         </Modal>
 
+        {/* Table Section */}
         <Table
           dataSource={state.list}
           rowKey="id"
           scroll={{ x: 800 }}
+          pagination={false}
           columns={[
             { title: "ឈ្មោះ", dataIndex: "name", key: "name" },
             { title: "Slug", dataIndex: "slug", key: "slug" },
@@ -440,6 +497,26 @@ const fetchCountries = async () => {
             },
           ]}
         />
+
+        {/* Custom Pagination Footer */}
+        <div className="flex justify-between items-center bg-white p-4 border border-gray-100 rounded-b-2xl shadow-sm mt-0.5">
+          <span className="text-gray-600 text-sm">
+            សរុប: <b className="text-indigo-600">{pagination.total || 0}</b>{" "}
+            ទិន្នន័យ
+          </span>
+          <Pagination
+            current={pagination.page}
+            pageSize={pagination.limit}
+            total={pagination.total}
+            onChange={handlePageChange}
+            showSizeChanger
+            pageSizeOptions={["10", "20", "50", "100"]}
+            showTotal={
+              (total, range) => `${range[0]}-${range[1]} នៃ ${total}`
+            }
+            className="ant-pagination-custom"
+          />
+        </div>
       </div>
     </MainPage>
   );

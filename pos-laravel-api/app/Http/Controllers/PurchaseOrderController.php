@@ -1,6 +1,8 @@
 <?php
+
 namespace App\Http\Controllers;
 
+use App\Models\PaymentMethod;
 use App\Models\PurchaseOrder;
 use App\Models\Supplier;
 use App\Models\User;
@@ -27,13 +29,14 @@ class PurchaseOrderController extends Controller
             $query->where('status', $request->status);
         }
 
-        $purchaseOrders = $query->with(['supplier', 'user', 'items.product'])
+        $purchaseOrders = $query->with(['supplier', 'createdBy', 'purchaseOrderItems.product', 'paymentMethod'])
             ->orderBy('id', 'desc')
             ->get();
 
         return response()->json([
             'list' => $purchaseOrders,
             'supplier' => Supplier::where('status', 'active')->get(),
+            'payment_method' => PaymentMethod::where('status', 'active')->get(),
             'user' => User::all(),
         ]);
     }
@@ -43,28 +46,39 @@ class PurchaseOrderController extends Controller
     {
         $data = $request->validated();
 
-        // បង្កើតលេខកូដ PO ដោយស្វ័យប្រវត្តិ ប្រសិនបើមិនបានផ្ញើមក
-        $data['po_number'] = $request->po_number ?? 'PO-' . now()->format('Ymd') . '-' . rand(1000, 9999);
+        // ពិនិត្យនិងទប់ស្កាត់ការជាន់គ្នានៃលេខកូដ PO ក្នុង Database
+        do {
+            $poNumber = $request->po_number ?? 'PO-' . now()->format('Ymd') . '-' . rand(1000, 9999);
+        } while (PurchaseOrder::where('po_number', $poNumber)->exists());
+
+        $data['po_number'] = $poNumber;
+        $data['order_date'] = $request->order_date ?? now()->format('Y-m-d');
+        $data['sub_total'] = $request->sub_total ?? 0.00;
+        $data['grand_total'] = $request->grand_total ?? $request->sub_total ?? 0.00;
 
         DB::beginTransaction();
         try {
             $purchaseOrder = PurchaseOrder::create($data);
 
-            // រក្សាទុក items ចូលក្នុងតារាង purchase_order_items
-            foreach ($request->items as $item) {
-                \App\Models\PurchaseOrderItem::create([
-                    'purchase_order_id' => $purchaseOrder->id,
-                    'product_id' => $item['product_id'],
-                    'quantity' => $item['quantity'],
-                    'unit_price' => $item['unit_price'],
-                    'total_line_price' => $item['quantity'] * $item['unit_price'],
-                ]);
+            // 📌 ពិនិត្យមើលថាតើមាន Items ផ្ញើមក និងមានទំហំធំជាង ០ ដែរឬទេ
+            if ($request->has('items') && is_array($request->items) && count($request->items) > 0) {
+                foreach ($request->items as $item) {
+                    if (is_array($item) && isset($item['product_id'])) {
+                        \App\Models\PurchaseOrderItem::create([
+                            'purchase_order_id' => $purchaseOrder->id,
+                            'product_id' => $item['product_id'],
+                            'quantity' => $item['quantity'] ?? 1,
+                            'unit_price' => $item['unit_price'] ?? 0.00,
+                            'total_line_price' => ($item['quantity'] ?? 1) * ($item['unit_price'] ?? 0.00),
+                        ]);
+                    }
+                }
             }
 
             DB::commit();
 
             return response()->json([
-                'data'    => $purchaseOrder->load('items'),
+                'data'    => $purchaseOrder->load('purchaseOrderItems'),
                 'message' => 'រក្សាទុកការបញ្ជាទិញបានជោគជ័យ!',
             ], 201);
 
@@ -72,15 +86,18 @@ class PurchaseOrderController extends Controller
             DB::rollBack();
             return response()->json([
                 'message' => 'មានបញ្ហាក្នុងពេលរក្សាទុក!',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
             ], 500);
         }
     }
 
+
     // show find ID
     public function show($id)
     {
-        $purchaseOrder = PurchaseOrder::with(['supplier', 'user', 'items.product'])->find($id);
+        $purchaseOrder = PurchaseOrder::with(['supplier', 'createdBy', 'purchaseOrderItems.product', 'paymentMethod'])->find($id);
 
         if (!$purchaseOrder) {
             return response()->json(['message' => 'រកមិនឃើញការបញ្ជាទិញ'], 404);
@@ -100,27 +117,32 @@ class PurchaseOrderController extends Controller
 
         $data = $request->validated();
 
+        $data['sub_total'] = $request->sub_total ?? 0.00;
+        $data['grand_total'] = $request->grand_total ?? $request->sub_total ?? 0.00;
+
         DB::beginTransaction();
         try {
             $purchaseOrder->update($data);
 
-            // លុប items ចាស់ចេញ រួចបញ្ចូល items ថ្មីចូលវិញ
-            $purchaseOrder->items()->delete();
+            // លុប items ចាស់ចេញ
+            $purchaseOrder->purchaseOrderItems()->delete();
 
-            foreach ($request->items as $item) {
-                \App\Models\PurchaseOrderItem::create([
-                    'purchase_order_id' => $purchaseOrder->id,
-                    'product_id' => $item['product_id'],
-                    'quantity' => $item['quantity'],
-                    'unit_price' => $item['unit_price'],
-                    'total_line_price' => $item['quantity'] * $item['unit_price'],
-                ]);
+            if ($request->has('items') && is_array($request->items)) {
+                foreach ($request->items as $item) {
+                    \App\Models\PurchaseOrderItem::create([
+                        'purchase_order_id' => $purchaseOrder->id,
+                        'product_id' => $item['product_id'],
+                        'quantity' => $item['quantity'],
+                        'unit_price' => $item['unit_price'],
+                        'total_line_price' => $item['quantity'] * $item['unit_price'],
+                    ]);
+                }
             }
 
             DB::commit();
 
             return response()->json([
-                'data'    => $purchaseOrder->load('items'),
+                'data'    => $purchaseOrder->load(['purchaseOrderItems', 'paymentMethod']),
                 'message' => 'កែប្រែការបញ្ជាទិញបានជោគជ័យ!',
             ]);
 
@@ -128,7 +150,9 @@ class PurchaseOrderController extends Controller
             DB::rollBack();
             return response()->json([
                 'message' => 'មានបញ្ហាក្នុងពេលកែប្រែ!',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
             ], 500);
         }
     }

@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ImeiTrackings;
+use App\Models\ImeiTracking;
 use App\Http\Requests\ImeiTrackingRequest;
 use App\Models\Product;
 use App\Models\Purchase_Orders;
+use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrders;
 use App\Models\Supplier;
 use App\Models\Sale;
@@ -15,7 +16,7 @@ class ImeiTrackingController extends Controller
 {
     public function index(Request $req)
     {
-        $query = ImeiTrackings::query();
+        $query = ImeiTracking::query();
 
         if ($req->filled('text_search')) {
             $query->where('imei_number', 'like', '%' . $req->input('text_search') . '%');
@@ -36,13 +37,15 @@ class ImeiTrackingController extends Controller
             $query->where('status', $req->input('status'));
         }
 
-        $imei_tracking = $query->with(['product', 'supplier', 'purchaseOrder', "sale"])->orderBy('id', 'desc')->get();
+        $imei_tracking = $query->with(['product', 'supplier', 'purchaseOrder', 'sale'])
+            ->orderBy('id', 'desc')
+            ->get();
 
         return response()->json([
             'list' => $imei_tracking,
             "product" => Product::all(),
             "supplier" => Supplier::all(),
-            "purchase" => PurchaseOrders::all(),
+            "purchase" => PurchaseOrder::all(),
             "sale" => Sale::all(),
         ]);
     }
@@ -50,7 +53,7 @@ class ImeiTrackingController extends Controller
     public function store(ImeiTrackingRequest $request)
     {
         $data = $request->validated();
-        $imei = ImeiTrackings::create($data);
+        $imei = ImeiTracking::create($data);
 
         return response()->json([
             'data'    => $imei,
@@ -60,7 +63,7 @@ class ImeiTrackingController extends Controller
 
     public function update(ImeiTrackingRequest $request, $id)
     {
-        $imei = ImeiTrackings::find($id);
+        $imei = ImeiTracking::find($id);
 
         if (!$imei) {
             return response()->json(['message' => 'រកមិនឃើញទិន្នន័យ'], 404);
@@ -77,7 +80,7 @@ class ImeiTrackingController extends Controller
 
     public function destroy($id)
     {
-        $imei = ImeiTrackings::find($id);
+        $imei = ImeiTracking::find($id);
         if ($imei) {
             $imei->delete();
             return response()->json(['success' => true, 'message' => 'លុបជោគជ័យ']);

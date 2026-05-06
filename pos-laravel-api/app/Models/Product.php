@@ -30,12 +30,12 @@ class Product extends Model
 
     public function category(): BelongsTo
     {
-        return $this->belongsTo(Categories::class);
+        return $this->belongsTo(Category::class);
     }
 
     public function subCategory(): BelongsTo
     {
-        return $this->belongsTo(SubCategories::class);
+        return $this->belongsTo(SubCategory::class);
     }
 
     public function brand(): BelongsTo
@@ -45,11 +45,11 @@ class Product extends Model
 
     public function imeiTrackings(): HasMany
     {
-        return $this->hasMany(ImeiTrackings::class);
+        return $this->hasMany(ImeiTracking::class);
     }
 
     public function saleItems(): HasMany
     {
-        return $this->hasMany(SaleItems::class);
+        return $this->hasMany(SaleItem::class);
     }
 }

@@ -25,7 +25,7 @@ class PaymentMethodRequest extends FormRequest
             'name'           => 'required|string|max:255',
             'account_number' => 'nullable|string|max:255',
             'qr_code'        => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'status'         => 'nullable|string',
+            'status'          => 'nullable|string|in:active,inactive',
         ];
     }
 }

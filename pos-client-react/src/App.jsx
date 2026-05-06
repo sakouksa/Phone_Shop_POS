@@ -22,6 +22,7 @@ import SupplierPage from "./page/supplier/SupplierPage.jsx";
 import ImeiTrackingPage from "./page/imei-tracking/ImeiTrackingPage.jsx";
 import PurchaseOrderPage from "./page/purchase-order/PurchaseOrderPage.jsx";
 import PurchaseOrderItemPage from "./page/purchase-order/PurchaseOrderItemPage.jsx";
+import PaymentMethodPage from "./page/payment_method/PaymentMethodPage.jsx";
 
 function App() {
   return (
@@ -48,7 +49,13 @@ function App() {
             <Route path="/supplier" element={<SupplierPage />} />
             <Route path="/imei_tracking" element={<ImeiTrackingPage />} />
             <Route path="/purchase_orders" element={<PurchaseOrderPage />} />
-            <Route path="/purchase_order_items" element={<PurchaseOrderItemPage />} />
+            <Route
+              path="/purchase_order_items"
+              element={<PurchaseOrderItemPage />}
+            />
+            <Route path="/customer" element={<CustomerPage />} />
+            {/* <Route path="/customer_type" element={<CustomerTypePage />} /> */}
+            <Route path="/payment_method" element={<PaymentMethodPage />} />
             <Route path="*" element={<RouteNoFound />} />
             <Route path="/500" element={<Error500 />} />
           </Route>
